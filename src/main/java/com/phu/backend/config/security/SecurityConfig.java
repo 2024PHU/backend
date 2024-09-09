@@ -1,4 +1,4 @@
-package com.phu.backend.config;
+package com.phu.backend.config.security;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
