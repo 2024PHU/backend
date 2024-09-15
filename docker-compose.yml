@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - friend-gym
+
+  back-end:
+    env_file:
+      - .env
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: friend-gym
+    restart: always
+    depends_on:
+      - redis
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    networks:
+      - friend-gym
+networks:
+  friend-gym:
+    driver: bridge
