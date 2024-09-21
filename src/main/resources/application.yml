@@ -1,4 +1,7 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
+
   config:
     import: optional:file:.env[.properties]
 
@@ -34,3 +37,10 @@ jwt:
   header: Authorization
   secret: ${JWT_SECRET}
   token-validity-in-seconds: 86400
+
+server:
+  port: 443
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-type: PKCS12
+    key-store-password: ${SSL_PASSWORD}
