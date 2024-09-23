@@ -26,8 +26,10 @@ public class MemberService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .part(request.getPart())
+                .gender(request.getGender())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .age(request.getAge())
+                .role("ROLE_USER")
                 .build();
 
         memberRepository.save(member);

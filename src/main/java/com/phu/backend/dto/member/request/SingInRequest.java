@@ -1,5 +1,6 @@
 package com.phu.backend.dto.member.request;
 
+import com.phu.backend.domain.member.Gender;
 import com.phu.backend.domain.member.Part;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -23,10 +24,11 @@ public class SingInRequest {
     @NotNull(message = "나이를 입력하세요")
     @Schema(description = "사용자 나이", nullable = false, example = "27")
     private Integer age;
+    @Schema(description = "사용자 성별", nullable = false, example = "MALE")
+    private Gender gender;
     @NotBlank(message = "전화번호를 입력하세요")
     @Schema(description = "사용자 전화번호", nullable = false, example = "01046666208")
     private String tel;
-    @NotNull(message = "트레이너 혹은 회원인지 선택해주세요")
     @Schema(description = "사용자 분류", nullable = false, example = "TRAINER")
     private Part part;
 }
