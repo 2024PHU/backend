@@ -70,7 +70,7 @@ public class AuthService {
     private Cookie createCookie(String key, String value) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24 * 60 * 60);
-//        cookie.setSecure(true); HTTPS 통신시 주석 해제
+        cookie.setSecure(true);
 //        cookie.setPath("/"); 쿠키가 적용 될 범위 설정 필요시 사용
         cookie.setHttpOnly(true);
 
