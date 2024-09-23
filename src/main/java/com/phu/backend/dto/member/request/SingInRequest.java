@@ -25,10 +25,12 @@ public class SingInRequest {
     @Schema(description = "사용자 나이", nullable = false, example = "27")
     private Integer age;
     @Schema(description = "사용자 성별", nullable = false, example = "MALE")
+    @NotNull
     private Gender gender;
     @NotBlank(message = "전화번호를 입력하세요")
     @Schema(description = "사용자 전화번호", nullable = false, example = "01046666208")
     private String tel;
     @Schema(description = "사용자 분류", nullable = false, example = "TRAINER")
+    @NotNull
     private Part part;
 }
