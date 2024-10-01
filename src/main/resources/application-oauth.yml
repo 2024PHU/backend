@@ -6,6 +6,7 @@ spring:
           google:
             client-secret: ${CLIENT_SECRET}
             client-id: ${CLIENT_ID}
+            redirect-uri: https://fitee.site/login/oauth2/code/google
             scope:
               - email
               - profile
