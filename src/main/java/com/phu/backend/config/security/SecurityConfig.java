@@ -1,7 +1,9 @@
 package com.phu.backend.config.security;
 
 import com.phu.backend.config.jwt.*;
+import com.phu.backend.config.oauth.OAuthSuccessHandler;
 import com.phu.backend.repository.jwt.RefreshTokenRepository;
+import com.phu.backend.config.oauth.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -28,6 +31,8 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuthSuccessHandler oAuthSuccessHandler;
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
@@ -51,7 +56,7 @@ public class SecurityConfig {
 
                         CorsConfiguration configuration = new CorsConfiguration();
 
-                        configuration.setAllowedOrigins(Collections.singletonList("https://localhost:3000"));
+                        configuration.setAllowedOrigins(Collections.singletonList("https://localhost:5173"));
                         configuration.setAllowedMethods(Collections.singletonList("*"));
                         configuration.setAllowCredentials(true);
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
@@ -69,15 +74,24 @@ public class SecurityConfig {
         http.httpBasic((auth) -> auth.disable());
 
         http.authorizeHttpRequests((auth) -> auth
-                .requestMatchers("/login", "/", "/sign-in", "/h2-console/**").permitAll()
+                .requestMatchers("/login", "/", "/sign-up", "/h2-console/**").permitAll()
                 .requestMatchers("/", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .requestMatchers("/reissue").permitAll()
+                .requestMatchers("/sign-up/social").permitAll()
                 .anyRequest().authenticated()
         );
+        http.oauth2Login((oauth2) ->
+                oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+                                .userService(customOAuth2UserService))
+                        .successHandler(oAuthSuccessHandler));
+
         http.addFilterBefore(new JwtExceptionFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(new JWTFilter(jwtUtil), LoginFilter.class);
+
+        http.addFilterBefore(new JWTFilter(jwtUtil), OAuth2LoginAuthenticationFilter.class);
+
         http.addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration),jwtUtil, refreshTokenRepository),
                 UsernamePasswordAuthenticationFilter.class);
+
         http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
 
         // 세션 STATELESS 설정

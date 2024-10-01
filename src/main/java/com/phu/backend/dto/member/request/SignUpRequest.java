@@ -10,7 +10,7 @@ import lombok.Getter;
 
 @Getter
 @Schema(description = "회원이 회원가입할때 필요한 데이터")
-public class SingInRequest {
+public class SignUpRequest {
     @NotBlank(message = "이메일을 입력하세요")
     @Email(message = "이메일 형식이 아닙니다")
     @Schema(description = "사용자 이메일", nullable = false, example = "mr6208@naver.com")
