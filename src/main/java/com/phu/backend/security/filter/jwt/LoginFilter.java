@@ -1,6 +1,7 @@
-package com.phu.backend.config.jwt;
+package com.phu.backend.security.filter.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.phu.backend.security.util.jwt.JWTUtil;
 import com.phu.backend.domain.jwt.RefreshToken;
 import com.phu.backend.dto.auth.MemberDetails;
 import com.phu.backend.dto.member.request.LoginRequest;

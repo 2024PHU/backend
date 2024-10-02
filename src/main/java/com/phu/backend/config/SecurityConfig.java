@@ -1,9 +1,13 @@
-package com.phu.backend.config.security;
+package com.phu.backend.config;
 
-import com.phu.backend.config.jwt.*;
-import com.phu.backend.config.oauth.OAuthSuccessHandler;
+import com.phu.backend.security.oauth.OAuthSuccessHandler;
 import com.phu.backend.repository.jwt.RefreshTokenRepository;
-import com.phu.backend.config.oauth.CustomOAuth2UserService;
+import com.phu.backend.security.oauth.CustomOAuth2UserService;
+import com.phu.backend.security.filter.jwt.CustomLogoutFilter;
+import com.phu.backend.security.filter.jwt.JWTFilter;
+import com.phu.backend.security.filter.jwt.JwtExceptionFilter;
+import com.phu.backend.security.filter.jwt.LoginFilter;
+import com.phu.backend.security.util.jwt.JWTUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

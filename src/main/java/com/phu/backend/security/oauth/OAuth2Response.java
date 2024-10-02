@@ -1,4 +1,4 @@
-package com.phu.backend.config.oauth;
+package com.phu.backend.security.oauth;
 
 public interface OAuth2Response {
     // 소셜 제공자

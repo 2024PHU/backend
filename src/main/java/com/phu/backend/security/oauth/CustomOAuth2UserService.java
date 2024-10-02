@@ -1,4 +1,4 @@
-package com.phu.backend.config.oauth;
+package com.phu.backend.security.oauth;
 
 import com.phu.backend.domain.member.Member;
 import com.phu.backend.repository.member.MemberRepository;

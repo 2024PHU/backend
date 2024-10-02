@@ -1,4 +1,4 @@
-package com.phu.backend.config.jwt;
+package com.phu.backend.security.filter.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phu.backend.exception.GlobalException;

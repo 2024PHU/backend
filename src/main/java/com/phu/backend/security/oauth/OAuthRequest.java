@@ -1,4 +1,4 @@
-package com.phu.backend.config.oauth;
+package com.phu.backend.security.oauth;
 
 import lombok.Builder;
 import lombok.Getter;

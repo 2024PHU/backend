@@ -1,6 +1,6 @@
 package com.phu.backend.service.auth;
 
-import com.phu.backend.config.jwt.JWTUtil;
+import com.phu.backend.security.util.jwt.JWTUtil;
 import com.phu.backend.domain.jwt.RefreshToken;
 import com.phu.backend.exception.jwt.RefreshTokenExpiredException;
 import com.phu.backend.exception.jwt.RefreshTokenNotExistException;
