@@ -1,4 +1,4 @@
-package com.phu.backend.config.redis;
+package com.phu.backend.service.redis;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

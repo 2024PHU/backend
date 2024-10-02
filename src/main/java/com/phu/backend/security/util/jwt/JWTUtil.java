@@ -1,4 +1,4 @@
-package com.phu.backend.config.jwt;
+package com.phu.backend.security.util.jwt;
 
 import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;

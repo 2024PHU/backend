@@ -1,5 +1,6 @@
-package com.phu.backend.config.jwt;
+package com.phu.backend.security.filter.jwt;
 
+import com.phu.backend.security.util.jwt.JWTUtil;
 import com.phu.backend.exception.jwt.RefreshTokenExpiredException;
 import com.phu.backend.exception.jwt.RefreshTokenNotExistException;
 import com.phu.backend.exception.jwt.TokenNotValidateException;

@@ -1,4 +1,4 @@
-package com.phu.backend.config.security;
+package com.phu.backend.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

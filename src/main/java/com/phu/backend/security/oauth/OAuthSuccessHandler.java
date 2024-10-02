@@ -1,6 +1,6 @@
-package com.phu.backend.config.oauth;
+package com.phu.backend.security.oauth;
 
-import com.phu.backend.config.jwt.JWTUtil;
+import com.phu.backend.security.util.jwt.JWTUtil;
 import com.phu.backend.domain.jwt.RefreshToken;
 import com.phu.backend.repository.jwt.RefreshTokenRepository;
 import jakarta.servlet.ServletException;
@@ -57,6 +57,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
             response.addCookie(createRefreshCookie("refresh", refresh));
             response.setHeader("Authorization", "Bearer " + access);
+            log.info("token:{}", access);
             response.sendRedirect("http://localhost:5173/");
         }
     }
