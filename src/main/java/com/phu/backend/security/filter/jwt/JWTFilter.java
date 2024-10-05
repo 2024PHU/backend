@@ -38,7 +38,6 @@ public class JWTFilter extends OncePerRequestFilter {
         // 순수 토큰 추출
         String accessToken = authorization.split(" ")[1];
 
-
         // 토큰 검증
         try {
             jwtUtil.isExpired(accessToken);
