@@ -31,6 +31,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         CustomOAuth2User customUserDetails = (CustomOAuth2User) authentication.getPrincipal();
 
         String username = customUserDetails.getUsername();
+        String email = customUserDetails.getEmail();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -45,12 +46,12 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         }
         // 소셜 로그인 진행 및 jwt 발급
         if (role.equals("ROLE_USER")) {
-            String access = jwtUtil.createJwt("access", username, role);
-            String refresh = jwtUtil.createJwt("refresh", username, role);
+            String access = jwtUtil.createJwt("access", email, role);
+            String refresh = jwtUtil.createJwt("refresh", email, role);
 
             RefreshToken refreshTokenForRedis = RefreshToken.builder()
                     .refreshToken(refresh)
-                    .email(username)
+                    .email(email)
                     .build();
 
             refreshTokenRepository.save(refreshTokenForRedis);

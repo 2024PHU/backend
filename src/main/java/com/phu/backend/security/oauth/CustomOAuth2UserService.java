@@ -54,6 +54,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
             // 추가 회원가입을 안한 회원인가
             OAuthRequest oAuthRequest = OAuthRequest.builder()
+                    .email(oAuth2Response.getEmail())
                     .username(socialId)
                     .name(oAuth2Response.getName())
                     .role("ROLE_BEFORE_USER")
@@ -66,6 +67,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             memberRepository.save(existData);
 
             OAuthRequest oAuthRequest = OAuthRequest.builder()
+                    .email(oAuth2Response.getEmail())
                     .username(socialId)
                     .name(oAuth2Response.getName())
                     .role("ROLE_USER")
