@@ -35,6 +35,8 @@ import java.util.List;
 public class SecurityConfig {
     private static final String LOCALHOST = "http://localhost:5173";
 
+    private static final String WEB = "https://fitee.site";
+
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
@@ -63,7 +65,7 @@ public class SecurityConfig {
 
                         CorsConfiguration configuration = new CorsConfiguration();
 
-                        configuration.setAllowedOrigins(List.of(LOCALHOST));
+                        configuration.setAllowedOrigins(List.of(LOCALHOST, WEB));
                         configuration.setAllowedMethods(Collections.singletonList("*"));
                         configuration.setAllowCredentials(true);
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
