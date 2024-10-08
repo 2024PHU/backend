@@ -16,7 +16,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - mariadb_data:/var/lib/mariadb
+      - mysql_data:/var/lib/mysql
     networks:
       - friend-gym
 
@@ -56,4 +56,4 @@ networks:
     driver: bridge
 
 volumes:
-  mariadb_data:
+  mysql_data:
