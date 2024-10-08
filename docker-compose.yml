@@ -42,8 +42,8 @@ services:
       - db
     environment:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      MARIADB_USER: ${MYSQL_USER}
-      MARIADB_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "8080:8080"
       - "443:443"
@@ -51,6 +51,7 @@ services:
       - .:/app
     networks:
       - friend-gym
+
 networks:
   friend-gym:
     driver: bridge
