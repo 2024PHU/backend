@@ -39,6 +39,7 @@ services:
     restart: always
     depends_on:
       - redis
+      - db
     ports:
       - "8080:8080"
       - "443:443"
@@ -49,3 +50,6 @@ services:
 networks:
   friend-gym:
     driver: bridge
+
+volumes:
+  mariadb_data:
