@@ -93,7 +93,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void addMember(AddMemberRequest request) {
+    public Long addMember(AddMemberRequest request) {
         Member trainer = getMember();
 
         if (request.getEmail().equals(trainer.getEmail())) {
@@ -117,5 +117,7 @@ public class MemberService {
                 .build();
 
         memberListRepository.save(memberList);
+
+        return member.getId();
     }
 }
