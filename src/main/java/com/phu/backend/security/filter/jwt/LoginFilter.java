@@ -1,21 +1,21 @@
 package com.phu.backend.security.filter.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.phu.backend.security.util.jwt.JWTUtil;
 import com.phu.backend.domain.jwt.RefreshToken;
 import com.phu.backend.dto.auth.MemberDetails;
 import com.phu.backend.dto.member.request.LoginRequest;
 import com.phu.backend.exception.member.EmailOrPasswordNotExistException;
 import com.phu.backend.repository.jwt.RefreshTokenRepository;
+import com.phu.backend.security.util.jwt.JWTUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -74,16 +74,21 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         refreshTokenRepository.save(refreshTokenForRedis);
 
         response.setHeader("Authorization", "Bearer " + access);
-        response.addCookie(createCookie("refresh", refresh));
+        ResponseCookie refreshCookie = createCookie("refresh", refresh);
+        response.setHeader("Set-Cookie", refreshCookie.toString());
         response.setStatus(HttpStatus.OK.value());
     }
 
-    private Cookie createCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24 * 60 * 60);
-        cookie.setSecure(true);
-//        cookie.setPath("/"); 쿠키가 적용 될 범위 설정 필요시 사용
-        cookie.setHttpOnly(true);
+    private ResponseCookie createCookie(String key, String value) {
+        ResponseCookie cookie = ResponseCookie.from(key, value)
+                .maxAge(24 * 60 * 60)
+                .secure(true)
+                .httpOnly(true)
+                .domain("fitee.site")
+                .domain("localhost")
+                .path("/")
+                .sameSite("None")
+                .build();
 
         return cookie;
     }
