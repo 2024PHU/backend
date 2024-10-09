@@ -37,8 +37,8 @@ public class MemberController {
 
     @PostMapping("/member/add")
     @Operation(summary = "회원 추가", description = "트레이너가 자신의 회원을 추가한다.")
-    public void addMember(@RequestBody @Valid AddMemberRequest request) {
-        memberService.addMember(request);
+    public ResponseEntity<Long> addMember(@RequestBody @Valid AddMemberRequest request) {
+        return ResponseEntity.ok(memberService.addMember(request));
     }
 
     @GetMapping("/member")

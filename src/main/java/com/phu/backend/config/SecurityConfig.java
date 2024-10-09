@@ -1,13 +1,14 @@
 package com.phu.backend.config;
 
-import com.phu.backend.security.oauth.OAuthSuccessHandler;
 import com.phu.backend.repository.jwt.RefreshTokenRepository;
-import com.phu.backend.security.oauth.CustomOAuth2UserService;
 import com.phu.backend.security.filter.jwt.CustomLogoutFilter;
 import com.phu.backend.security.filter.jwt.JWTFilter;
 import com.phu.backend.security.filter.jwt.JwtExceptionFilter;
 import com.phu.backend.security.filter.jwt.LoginFilter;
+import com.phu.backend.security.oauth.CustomOAuth2UserService;
+import com.phu.backend.security.oauth.OAuthSuccessHandler;
 import com.phu.backend.security.util.jwt.JWTUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,18 +23,25 @@ import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationF
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    private static final String LOCALHOST = "http://localhost:5173";
+
+    private static final String WEB = "https://fitee.site";
+
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
     private final RefreshTokenRepository refreshTokenRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final OAuthSuccessHandler oAuthSuccessHandler;
-    private final CorsFilter corsFilter;
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
@@ -49,6 +57,25 @@ public class SecurityConfig {
         http.headers(headers ->
                 headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
         );
+
+        http.cors((cors) ->
+                cors.configurationSource(new CorsConfigurationSource() {
+                    @Override
+                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+
+                        CorsConfiguration configuration = new CorsConfiguration();
+
+                        configuration.setAllowedOrigins(List.of(LOCALHOST, WEB));
+                        configuration.setAllowedMethods(Collections.singletonList("*"));
+                        configuration.setAllowCredentials(true);
+                        configuration.setAllowedHeaders(Collections.singletonList("*"));
+                        configuration.setMaxAge(3600L);
+                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+
+                        return configuration;
+                    }
+                }));
+
 
         http.csrf((auth) -> auth.disable());
 
@@ -77,8 +104,6 @@ public class SecurityConfig {
                 UsernamePasswordAuthenticationFilter.class);
 
         http.addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshTokenRepository), LogoutFilter.class);
-
-        http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
 
         // 세션 STATELESS 설정
         http.sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
