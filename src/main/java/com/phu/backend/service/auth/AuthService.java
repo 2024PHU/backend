@@ -11,6 +11,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -62,17 +63,21 @@ public class AuthService {
         refreshTokenRepository.delete(redisToken);
         refreshTokenRepository.save(newRefreshToken);
 
-        response.addCookie(createCookie("refresh", refreshToken));
-
+        ResponseCookie refreshCookie = createCookie("refresh", refreshToken);
+        response.setHeader("Set-Cookie", refreshCookie.toString());
         return accessToken;
     }
 
-    private Cookie createCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24 * 60 * 60);
-        cookie.setSecure(true);
-//        cookie.setPath("/"); 쿠키가 적용 될 범위 설정 필요시 사용
-        cookie.setHttpOnly(true);
+    private ResponseCookie createCookie(String key, String value) {
+        ResponseCookie cookie = ResponseCookie.from(key, value)
+                .maxAge(24 * 60 * 60)
+                .secure(true)
+                .httpOnly(true)
+                .domain("fitee.site")
+                .domain("localhost")
+                .path("/")
+                .sameSite("None")
+                .build();
 
         return cookie;
     }
