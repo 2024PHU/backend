@@ -3,6 +3,7 @@ package com.phu.backend.controller.member;
 import com.phu.backend.dto.member.request.AddMemberRequest;
 import com.phu.backend.dto.member.request.SignUpRequest;
 import com.phu.backend.dto.member.request.SignUpSocial;
+import com.phu.backend.dto.member.response.MemberInfoResponse;
 import com.phu.backend.dto.member.response.MemberResponse;
 import com.phu.backend.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,10 +12,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,5 +45,17 @@ public class MemberController {
     @Operation(summary = "자기정보 조회", description = "사용자가 자기 정보를 조회한다")
     public ResponseEntity<MemberResponse> userInfo() {
         return ResponseEntity.ok().body(memberService.userInfo());
+    }
+
+    @GetMapping("/pt/member/{member-list-id}")
+    @Operation(summary = "회원 조회", description = "트레이너가 자신의 회원의 상세정보를 조회한다.")
+    public ResponseEntity<MemberResponse> memberInfo(@PathVariable(name = "member-list-id") Long id) {
+        return ResponseEntity.ok(memberService.getMyMemberInfo(id));
+    }
+
+    @GetMapping("/pt/member")
+    @Operation(summary = "회원 전체 조회", description = "트레이너가 자신의 PT 회원을 전체조회한다.")
+    public ResponseEntity<List<MemberInfoResponse>> memberInfoList() {
+        return ResponseEntity.ok(memberService.getMyMemberInfoList());
     }
 }

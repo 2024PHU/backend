@@ -7,6 +7,7 @@ import com.phu.backend.dto.auth.MemberDetails;
 import com.phu.backend.dto.member.request.AddMemberRequest;
 import com.phu.backend.dto.member.request.SignUpRequest;
 import com.phu.backend.dto.member.request.SignUpSocial;
+import com.phu.backend.dto.member.response.MemberInfoResponse;
 import com.phu.backend.dto.member.response.MemberResponse;
 import com.phu.backend.exception.member.*;
 import com.phu.backend.exception.oauth.NotFoundSocialIdException;
@@ -21,6 +22,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -114,10 +118,34 @@ public class MemberService {
         MemberList memberList = MemberList.builder()
                 .trainer(trainer)
                 .memberEmail(request.getEmail())
+                .memberName(member.getName())
                 .build();
 
         memberListRepository.save(memberList);
 
-        return member.getId();
+        return memberList.getId();
+    }
+
+    public MemberResponse getMyMemberInfo(Long id) {
+        MemberList memberList = memberListRepository.findById(id).orElseThrow(NotFoundMemberException::new);
+
+        Member member = memberRepository.findByEmail(memberList.getMemberEmail())
+                .orElseThrow(NotFoundMemberException::new);
+
+        return MemberResponse.builder()
+                .gender(member.getGender())
+                .name(member.getName())
+                .tel(member.getTel())
+                .age(member.getAge())
+                .email(member.getEmail())
+                .build();
+    }
+
+    public List<MemberInfoResponse> getMyMemberInfoList() {
+        Member member = getMember();
+
+        List<MemberList> list = memberListRepository.findAllByTrainer(member);
+
+        return list.stream().map(MemberInfoResponse::new).collect(Collectors.toList());
     }
 }

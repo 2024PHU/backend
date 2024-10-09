@@ -24,9 +24,12 @@ public class MemberList extends BaseTimeEntity {
 
     private String memberEmail;
 
+    private String memberName;
+
     @Builder
-    public MemberList(Member trainer, String memberEmail) {
+    public MemberList(Member trainer, String memberEmail, String memberName) {
         this.trainer = trainer;
         this.memberEmail = memberEmail;
+        this.memberName = memberName;
     }
 }
