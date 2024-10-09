@@ -1,14 +1,14 @@
 package com.phu.backend.security.oauth;
 
-import com.phu.backend.security.util.jwt.JWTUtil;
 import com.phu.backend.domain.jwt.RefreshToken;
 import com.phu.backend.repository.jwt.RefreshTokenRepository;
+import com.phu.backend.security.util.jwt.JWTUtil;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -41,7 +41,9 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         log.info("username:{}", username);
         // 추가 회원가입
         if (role.equals("ROLE_BEFORE_USER")) {
-            response.addCookie(createSocialCookie("social_id", username));
+            ResponseCookie cookie = createSocialCookie("social_id", username);
+            response.setHeader("Set-Cookie", cookie.toString());
+
             response.sendRedirect("http://localhost:5173/social/sign-up");
         }
         // 소셜 로그인 진행 및 jwt 발급
@@ -56,29 +58,38 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
             refreshTokenRepository.save(refreshTokenForRedis);
 
-            response.addCookie(createRefreshCookie("refresh", refresh));
+            ResponseCookie refreshCookie = createRefreshCookie("refresh", refresh);
+            response.setHeader("Set-Cookie", refreshCookie.toString());
             response.setHeader("Authorization", "Bearer " + access);
             log.info("token:{}", access);
             response.sendRedirect("http://localhost:5173/");
         }
     }
 
-    private Cookie createRefreshCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24 * 60 * 60);
-        cookie.setSecure(true);
-//        cookie.setPath("/"); 쿠키가 적용 될 범위 설정 필요시 사용
-        cookie.setHttpOnly(true);
+    private ResponseCookie createRefreshCookie(String key, String value) {
+        ResponseCookie cookie = ResponseCookie.from(key, value)
+                .maxAge(24 * 60 * 60)
+                .secure(true)
+                .httpOnly(true)
+                .domain("fitee.site")
+                .domain("localhost")
+                .path("/")
+                .sameSite("None")
+                .build();
 
         return cookie;
     }
 
-    private Cookie createSocialCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(30 * 60);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
+    private ResponseCookie createSocialCookie(String key, String value) {
+        ResponseCookie cookie = ResponseCookie.from(key, value)
+                .maxAge(30 * 60)
+                .secure(true)
+                .httpOnly(true)
+                .domain("fitee.site")
+                .domain("localhost")
+                .path("/")
+                .sameSite("None")
+                .build();
 
         return cookie;
     }

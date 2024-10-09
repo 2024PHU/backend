@@ -14,6 +14,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
@@ -73,12 +74,17 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // 로그아웃 진행
         refreshTokenRepository.deleteById(refresh);
+        ResponseCookie cookie = ResponseCookie.from("refresh", null)
+                .maxAge(0)
+                .secure(true)
+                .httpOnly(true)
+                .domain("fitee.site")
+                .domain("localhost")
+                .path("/")
+                .sameSite("None")
+                .build();
 
-        Cookie cookie = new Cookie("refresh", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-
-        response.addCookie(cookie);
+        response.setHeader("Set-Cookie", cookie.toString());
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }
