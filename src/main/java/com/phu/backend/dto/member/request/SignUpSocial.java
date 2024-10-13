@@ -25,4 +25,7 @@ public class SignUpSocial {
     @Schema(description = "사용자 분류", nullable = false, example = "TRAINER")
     @NotNull
     private Part part;
+    @NotBlank(message = "소셜아이디를 입력해주세요")
+    @Schema(description = "사용자 소셜아이디", nullable = false, example = "소셜아이디")
+    private String socialId;
 }

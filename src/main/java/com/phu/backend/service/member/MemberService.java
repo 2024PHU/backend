@@ -13,8 +13,6 @@ import com.phu.backend.exception.member.*;
 import com.phu.backend.exception.oauth.NotFoundSocialIdException;
 import com.phu.backend.repository.member.MemberListRepository;
 import com.phu.backend.repository.member.MemberRepository;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -55,19 +53,13 @@ public class MemberService {
     }
 
     @Transactional
-    public void signUpSocial(SignUpSocial request, HttpServletRequest servletRequest) {
-        String socialId = null;
-        Cookie[] cookies = servletRequest.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("social_id")) {
-                socialId = cookie.getValue();
-            }
-        }
-        if (socialId == null) {
+    public void signUpSocial(SignUpSocial request) {
+
+        if (memberRepository.findBySocialId(request.getSocialId()) == null) {
             throw new NotFoundSocialIdException();
         }
 
-        Member member = memberRepository.findBySocialId(socialId);
+        Member member = memberRepository.findBySocialId(request.getSocialId());
         String password = passwordEncoder.encode(request.getPassword());
 
         member.signUpForSocial(password, request.getAge(), request.getGender(), request.getTel(), request.getPart(), "ROLE_USER");

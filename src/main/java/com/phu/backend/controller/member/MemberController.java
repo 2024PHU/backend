@@ -8,7 +8,6 @@ import com.phu.backend.dto.member.response.MemberResponse;
 import com.phu.backend.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -31,8 +30,8 @@ public class MemberController {
 
     @PostMapping("/sign-up/social")
     @Operation(summary = "소셜 회원가입", description = "사용자가 소셜 로그인 회원가입을 한다")
-    public void signUp(@RequestBody @Valid SignUpSocial request, HttpServletRequest servletRequest) {
-        memberService.signUpSocial(request, servletRequest);
+    public void signUp(@RequestBody @Valid SignUpSocial request) {
+        memberService.signUpSocial(request);
     }
 
     @PostMapping("/member/add")
