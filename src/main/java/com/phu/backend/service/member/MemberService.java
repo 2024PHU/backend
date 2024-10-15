@@ -10,7 +10,6 @@ import com.phu.backend.dto.member.request.SignUpSocial;
 import com.phu.backend.dto.member.response.MemberInfoResponse;
 import com.phu.backend.dto.member.response.MemberResponse;
 import com.phu.backend.exception.member.*;
-import com.phu.backend.exception.oauth.NotFoundSocialIdException;
 import com.phu.backend.repository.member.MemberListRepository;
 import com.phu.backend.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -54,15 +53,8 @@ public class MemberService {
 
     @Transactional
     public void signUpSocial(SignUpSocial request) {
-
-        if (memberRepository.findBySocialId(request.getSocialId()) == null) {
-            throw new NotFoundSocialIdException();
-        }
-
-        Member member = memberRepository.findBySocialId(request.getSocialId());
-        String password = passwordEncoder.encode(request.getPassword());
-
-        member.signUpForSocial(password, request.getAge(), request.getGender(), request.getTel(), request.getPart(), "ROLE_USER");
+        Member member = getMember();
+        member.signUpForSocial(request.getAge(), request.getGender(), request.getTel(), request.getPart(), "ROLE_USER");
     }
 
     public MemberResponse userInfo() {
