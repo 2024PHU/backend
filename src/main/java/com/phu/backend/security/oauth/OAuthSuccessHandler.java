@@ -48,11 +48,10 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
         log.info("username:{}", username);
         // 추가 회원가입
         if (role.equals("ROLE_BEFORE_USER")) {
-            response.setContentType("application/json; charset=UTF-8");
-            response.setCharacterEncoding("UTF-8");
-
-            String jsonResponse = "{\"email\": \"" + member.getEmail() + "\", \"name\": \"" + member.getName() + "\", \"social_id\": \"" + username + "\"}";
-            response.getWriter().write(jsonResponse);
+            // 클라이언트에게 유효기간 10분인 엑세스토큰 발급
+            String access = jwtUtil.createJwt("access", email, role);
+            response.setHeader("Authorization", "Bearer " + access);
+            response.sendRedirect("http://localhost:5173/social/sign-up");
         }
         // 소셜 로그인 진행 및 jwt 발급
         if (role.equals("ROLE_USER")) {
@@ -69,6 +68,7 @@ public class OAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
             ResponseCookie refreshCookie = createRefreshCookie("refresh", refresh);
             response.setHeader("Set-Cookie", refreshCookie.toString());
             response.setHeader("Authorization", "Bearer " + access);
+            response.sendRedirect("http://localhost:5173/");
             log.info("token:{}", access);
         }
     }
