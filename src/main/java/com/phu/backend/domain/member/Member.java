@@ -52,8 +52,7 @@ public class Member extends BaseTimeEntity {
         this.name = name;
     }
 
-    public void signUpForSocial(String password, Integer age, Gender gender, String tel, Part part, String role) {
-        this.password = password;
+    public void signUpForSocial(Integer age, Gender gender, String tel, Part part, String role) {
         this.age = age;
         this.gender = gender;
         this.tel = tel;
