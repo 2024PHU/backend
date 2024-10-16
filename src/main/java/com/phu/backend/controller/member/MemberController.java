@@ -1,6 +1,7 @@
 package com.phu.backend.controller.member;
 
 import com.phu.backend.dto.member.request.AddMemberRequest;
+import com.phu.backend.dto.member.request.MemberUpdateRequest;
 import com.phu.backend.dto.member.request.SignUpRequest;
 import com.phu.backend.dto.member.request.SignUpSocial;
 import com.phu.backend.dto.member.response.MemberInfoResponse;
@@ -62,5 +63,11 @@ public class MemberController {
     @Operation(summary = "회원 삭제", description = "트레이너가 자신의 PT 회원을 삭제시킨다.")
     public void memberInfoList(@PathVariable(name = "member-list-id") Long id) {
         memberService.deleteMember(id);
+    }
+
+    @PutMapping("/pt/member")
+    @Operation(summary = "사용자 정보 수정", description = "자신의 정보를 수정한다.")
+    public void updateMyInfo(@RequestBody @Valid MemberUpdateRequest request){
+        memberService.updateMember(request);
     }
 }
