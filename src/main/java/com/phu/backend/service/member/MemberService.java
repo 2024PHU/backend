@@ -5,6 +5,7 @@ import com.phu.backend.domain.member.MemberList;
 import com.phu.backend.domain.member.Part;
 import com.phu.backend.dto.auth.MemberDetails;
 import com.phu.backend.dto.member.request.AddMemberRequest;
+import com.phu.backend.dto.member.request.MemberUpdateRequest;
 import com.phu.backend.dto.member.request.SignUpRequest;
 import com.phu.backend.dto.member.request.SignUpSocial;
 import com.phu.backend.dto.member.response.MemberInfoResponse;
@@ -142,5 +143,11 @@ public class MemberService {
         }
 
         memberListRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void updateMember(MemberUpdateRequest request) {
+        Member member = getMember();
+        member.update(request.getName(), request.getAge(), request.getTel());
     }
 }
