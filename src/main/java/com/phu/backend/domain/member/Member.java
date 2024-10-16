@@ -59,4 +59,10 @@ public class Member extends BaseTimeEntity {
         this.part = part;
         this.role = role;
     }
+
+    public void update(String name, Integer age, String tel) {
+        this.name = name;
+        this.age = age;
+        this.tel = tel;
+    }
 }
