@@ -132,4 +132,15 @@ public class MemberService {
 
         return list.stream().map(MemberInfoResponse::new).collect(Collectors.toList());
     }
+
+    @Transactional
+    public void deleteMember(Long id) {
+        Member member = getMember();
+
+        if (member.getPart() == Part.MEMBER) {
+            throw new TrainerRoleException();
+        }
+
+        memberListRepository.deleteById(id);
+    }
 }
