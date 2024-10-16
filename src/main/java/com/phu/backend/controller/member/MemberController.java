@@ -57,4 +57,10 @@ public class MemberController {
     public ResponseEntity<List<MemberInfoResponse>> memberInfoList() {
         return ResponseEntity.ok(memberService.getMyMemberInfoList());
     }
+
+    @DeleteMapping("/pt/member/{member-list-id}")
+    @Operation(summary = "회원 삭제", description = "트레이너가 자신의 PT 회원을 삭제시킨다.")
+    public void memberInfoList(@PathVariable(name = "member-list-id") Long id) {
+        memberService.deleteMember(id);
+    }
 }
