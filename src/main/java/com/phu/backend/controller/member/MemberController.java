@@ -1,10 +1,8 @@
 package com.phu.backend.controller.member;
 
-import com.phu.backend.dto.member.request.AddMemberRequest;
-import com.phu.backend.dto.member.request.MemberUpdateRequest;
-import com.phu.backend.dto.member.request.SignUpRequest;
-import com.phu.backend.dto.member.request.SignUpSocial;
+import com.phu.backend.dto.member.request.*;
 import com.phu.backend.dto.member.response.MemberInfoResponse;
+import com.phu.backend.dto.member.response.MemberMemoResponse;
 import com.phu.backend.dto.member.response.MemberResponse;
 import com.phu.backend.service.member.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,16 +39,22 @@ public class MemberController {
         return ResponseEntity.ok(memberService.addMember(request));
     }
 
+    @PostMapping("/pt/add/info/{member-list-id}")
+    @Operation(summary = "회원정보 입력", description = "트레이너가 추가한 회원의 상세정보를 입력받는다.")
+    public void addMemberInfo(@PathVariable(name = "member-list-id") Long id, @RequestBody @Valid AddMemberMemoRequest request) {
+        memberService.addMemberInfo(id,request);
+    }
+
+    @GetMapping("/pt/info/{member-list-id}")
+    @Operation(summary = "회원정보 상세조회", description = "트레이너의 회원정보를 상세조회한다.")
+    public ResponseEntity<MemberMemoResponse> getMemberInfo(@PathVariable(name = "member-list-id") Long id) {
+        return ResponseEntity.ok(memberService.getMyMemberInfo(id));
+    }
+
     @GetMapping("/member")
     @Operation(summary = "자기정보 조회", description = "사용자가 자기 정보를 조회한다")
     public ResponseEntity<MemberResponse> userInfo() {
         return ResponseEntity.ok().body(memberService.userInfo());
-    }
-
-    @GetMapping("/pt/member/{member-list-id}")
-    @Operation(summary = "회원 조회", description = "트레이너가 자신의 회원의 상세정보를 조회한다.")
-    public ResponseEntity<MemberResponse> memberInfo(@PathVariable(name = "member-list-id") Long id) {
-        return ResponseEntity.ok(memberService.getMyMemberInfo(id));
     }
 
     @GetMapping("/pt/member")
