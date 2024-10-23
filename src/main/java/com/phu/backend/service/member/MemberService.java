@@ -2,16 +2,16 @@ package com.phu.backend.service.member;
 
 import com.phu.backend.domain.member.Member;
 import com.phu.backend.domain.member.MemberList;
+import com.phu.backend.domain.member.MemberMemo;
 import com.phu.backend.domain.member.Part;
 import com.phu.backend.dto.auth.MemberDetails;
-import com.phu.backend.dto.member.request.AddMemberRequest;
-import com.phu.backend.dto.member.request.MemberUpdateRequest;
-import com.phu.backend.dto.member.request.SignUpRequest;
-import com.phu.backend.dto.member.request.SignUpSocial;
+import com.phu.backend.dto.member.request.*;
 import com.phu.backend.dto.member.response.MemberInfoResponse;
+import com.phu.backend.dto.member.response.MemberMemoResponse;
 import com.phu.backend.dto.member.response.MemberResponse;
 import com.phu.backend.exception.member.*;
 import com.phu.backend.repository.member.MemberListRepository;
+import com.phu.backend.repository.member.MemberMemoRepository;
 import com.phu.backend.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +31,8 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final MemberListRepository memberListRepository;
+
+    private final MemberMemoRepository memberMemoRepository;
 
     @Transactional
     public void signUp(SignUpRequest request) {
@@ -111,18 +113,19 @@ public class MemberService {
         return memberList.getId();
     }
 
-    public MemberResponse getMyMemberInfo(Long id) {
+    public MemberMemoResponse getMyMemberInfo(Long id) {
         MemberList memberList = memberListRepository.findById(id).orElseThrow(NotFoundMemberException::new);
 
-        Member member = memberRepository.findByEmail(memberList.getMemberEmail())
+        MemberMemo memberMemo = memberMemoRepository.findByMemberEmail(memberList.getMemberEmail())
                 .orElseThrow(NotFoundMemberException::new);
 
-        return MemberResponse.builder()
-                .gender(member.getGender())
-                .name(member.getName())
-                .tel(member.getTel())
-                .age(member.getAge())
-                .email(member.getEmail())
+        return MemberMemoResponse.builder()
+                .memberName(memberMemo.getMemberName())
+                .memberAge(memberMemo.getMemberAge())
+                .memberTarget(memberMemo.getMemberTarget())
+                .significant(memberMemo.getSignificant())
+                .ptStartDate(memberMemo.getPtStartDate())
+                .ptEndDate(memberMemo.getPtEndDate())
                 .build();
     }
 
@@ -149,5 +152,29 @@ public class MemberService {
     public void updateMember(MemberUpdateRequest request) {
         Member member = getMember();
         member.update(request.getName(), request.getAge(), request.getTel());
+    }
+
+    @Transactional
+    public void addMemberInfo(Long id, AddMemberMemoRequest request) {
+        Member trainer = getMember();
+
+        MemberList memberList = memberListRepository.findById(id).orElseThrow(NotFoundMemberException::new);
+
+        String email = memberList.getMemberEmail();
+
+        Member member = memberRepository.findByEmail(email).orElseThrow(NotFoundMemberException::new);
+
+        MemberMemo memo = MemberMemo.builder()
+                .memberAge(member.getAge())
+                .memberName(member.getName())
+                .memberTarget(request.getMemberTarget())
+                .significant(request.getSignificant())
+                .ptStartDate(request.getPtStartDate())
+                .ptEndDate(request.getPtEndDate())
+                .trainer(trainer)
+                .memberEmail(member.getEmail())
+                .build();
+
+        memberMemoRepository.save(memo);
     }
 }
