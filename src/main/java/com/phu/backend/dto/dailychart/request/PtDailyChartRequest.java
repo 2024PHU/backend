@@ -17,7 +17,7 @@ public class PtDailyChartRequest {
     @NotNull(message = "차트 종류를 선택하세요")
     @Schema(description = "차트 종류", nullable = false, example = "PT")
     private Branch branch;
-    @NotNull
+    @NotNull(message = "운동 기록 날짜를 입력해주세요")
     @Schema(description = "운동 날짜", nullable = false, example = "2024-10-29")
     private LocalDate chartDate;
     private Integer weight;
