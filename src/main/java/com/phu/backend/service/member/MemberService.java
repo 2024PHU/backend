@@ -119,7 +119,11 @@ public class MemberService {
         MemberMemo memberMemo = memberMemoRepository.findByMemberEmail(memberList.getMemberEmail())
                 .orElseThrow(NotFoundMemberException::new);
 
+        Member member = memberRepository.findByEmail(memberMemo.getMemberEmail())
+                .orElseThrow(NotFoundMemberException::new);
+
         return MemberMemoResponse.builder()
+                .id(member.getId())
                 .memberName(memberMemo.getMemberName())
                 .memberAge(memberMemo.getMemberAge())
                 .memberTarget(memberMemo.getMemberTarget())
