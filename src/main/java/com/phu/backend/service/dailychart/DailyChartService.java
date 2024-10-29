@@ -5,11 +5,13 @@ import com.phu.backend.domain.dailychart.DailyChart;
 import com.phu.backend.domain.dailychart.ExerciseArea;
 import com.phu.backend.domain.dailychart.Routine;
 import com.phu.backend.domain.member.Member;
+import com.phu.backend.domain.member.Part;
 import com.phu.backend.dto.dailychart.request.PtDailyChartRequest;
 import com.phu.backend.dto.dailychart.response.DailyChartResponse;
 import com.phu.backend.exception.dailychart.BranchIsNotValidException;
 import com.phu.backend.exception.dailychart.NotFoundChartException;
 import com.phu.backend.exception.member.NotFoundMemberException;
+import com.phu.backend.exception.member.TrainerRoleException;
 import com.phu.backend.repository.dailychart.DailyChartRepository;
 import com.phu.backend.repository.dailychart.RoutineRepository;
 import com.phu.backend.repository.member.MemberRepository;
@@ -35,6 +37,10 @@ public class DailyChartService {
             throw new BranchIsNotValidException();
         }
         Member trainer = memberService.getMember();
+
+        if (trainer.getPart().equals(Part.MEMBER)) {
+            throw new TrainerRoleException();
+        }
 
         Member member = memberRepository.findById(request.getId())
                 .orElseThrow(NotFoundMemberException::new);
