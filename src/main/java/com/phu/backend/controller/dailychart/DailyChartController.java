@@ -1,6 +1,8 @@
 package com.phu.backend.controller.dailychart;
 
+import com.phu.backend.dto.dailychart.request.MemberDailyChartRequest;
 import com.phu.backend.dto.dailychart.request.PtDailyChartRequest;
+import com.phu.backend.dto.dailychart.response.DailyChartListResponse;
 import com.phu.backend.dto.dailychart.response.DailyChartResponse;
 import com.phu.backend.service.dailychart.DailyChartService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +11,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,9 +25,21 @@ public class DailyChartController {
         return ResponseEntity.ok().body(dailyChartService.addChartPt(request));
     }
 
+    @PostMapping("/member/chart")
+    @Operation(summary = "회원(개인운동) 데일리 차트 생성", description = "회원이 개인운동 후 데일리 차트를 생성한다.")
+    public ResponseEntity<Long> addChartMember(@RequestBody @Valid MemberDailyChartRequest request) {
+        return ResponseEntity.ok().body(dailyChartService.addChartMember(request));
+    }
+
     @GetMapping("/chart/{chart-id}")
     @Operation(summary = "데일리 차트 조회", description = "사용자가 데일리 차트를 상세조회한다.")
-    public ResponseEntity<DailyChartResponse> getDailyChart(@PathVariable(value = "chart-id") Long id) {
+    public ResponseEntity<DailyChartResponse> getDailyChart(@PathVariable(name = "chart-id") Long id) {
         return ResponseEntity.ok().body(dailyChartService.getDailyCart(id));
+    }
+
+    @GetMapping("/chart/all/{member-id}")
+    @Operation(summary = "회원별 데일리 차트 전체조회", description = "회원별 데일리 차트를 전체조회한다.")
+    public ResponseEntity<List<DailyChartListResponse>> getAllDailyChart(@PathVariable(name = "member-id") Long id) {
+        return ResponseEntity.ok().body(dailyChartService.getAllDailyCart(id));
     }
 }

@@ -5,10 +5,14 @@ import com.phu.backend.domain.dailychart.DailyChart;
 import com.phu.backend.domain.dailychart.ExerciseArea;
 import com.phu.backend.domain.dailychart.Routine;
 import com.phu.backend.domain.member.Member;
+import com.phu.backend.domain.member.MemberList;
 import com.phu.backend.domain.member.Part;
+import com.phu.backend.dto.dailychart.request.MemberDailyChartRequest;
 import com.phu.backend.dto.dailychart.request.PtDailyChartRequest;
+import com.phu.backend.dto.dailychart.response.DailyChartListResponse;
 import com.phu.backend.dto.dailychart.response.DailyChartResponse;
 import com.phu.backend.exception.dailychart.BranchIsNotValidException;
+import com.phu.backend.exception.dailychart.NotConnectedToTrainerException;
 import com.phu.backend.exception.dailychart.NotFoundChartException;
 import com.phu.backend.exception.dailychart.NotFoundChartMemberException;
 import com.phu.backend.exception.member.MemberDuplicationException;
@@ -96,5 +100,72 @@ public class DailyChartService {
                 .routines(exerciseAreas)
                 .memo(dailyChart.getMemo())
                 .build();
+    }
+
+    @Transactional
+    public Long addChartMember(MemberDailyChartRequest request) {
+        Member member = memberService.getMember();
+
+        MemberList memberList = memberListRepository.findByMemberEmail(member.getEmail())
+                .orElseThrow(NotConnectedToTrainerException::new);
+
+        DailyChart chart = DailyChart.builder()
+                .branch(Branch.PERSONAL)
+                .chartDate(request.getChartDate())
+                .weight(request.getWeight())
+                .memberEmail(member.getEmail())
+                .trainer(memberList.getTrainer())
+                .memo(request.getMemo())
+                .build();
+
+        dailyChartRepository.save(chart);
+
+        List<Routine> routines = request.getRoutines().stream().map(exerciseArea ->
+                Routine.builder()
+                        .routine(exerciseArea)
+                        .dailyChart(chart)
+                        .build())
+                .collect(Collectors.toList());
+
+        routineRepository.saveAll(routines);
+
+        return chart.getId();
+    }
+
+    public List<DailyChartListResponse> getAllDailyCart(Long id) {
+        Member user = memberService.getMember();
+
+        if (user.getPart().equals(Part.TRAINER)) {
+            Member member = memberRepository.findById(id)
+                    .orElseThrow(NotFoundMemberException::new);
+
+            List<DailyChart> dailyCharts = dailyChartRepository
+                    .findAllByTrainerAndMemberEmail(user, member.getEmail());
+
+            return dailyCharts.stream()
+                    .map(dailyChart -> {
+                        DailyChartListResponse response = new DailyChartListResponse(dailyChart);
+
+                        List<ExerciseArea> exerciseAreas = routineRepository.findAllByDailyChart(dailyChart)
+                                .stream().map(Routine::getRoutine).collect(Collectors.toList());
+
+                        response.confirmRoutines(exerciseAreas);
+                        return response;
+
+                    }).collect(Collectors.toList());
+        } else {
+            List<DailyChart> dailyCharts = dailyChartRepository.findAllByMemberEmail(user.getEmail());
+
+            return dailyCharts.stream()
+                    .map(dailyChart -> {
+                        DailyChartListResponse response = new DailyChartListResponse(dailyChart);
+
+                        List<ExerciseArea> exerciseAreas = routineRepository.findAllByDailyChart(dailyChart)
+                                .stream().map(Routine::getRoutine).collect(Collectors.toList());
+
+                        response.confirmRoutines(exerciseAreas);
+                        return response;
+                    } ).collect(Collectors.toList());
+        }
     }
 }
