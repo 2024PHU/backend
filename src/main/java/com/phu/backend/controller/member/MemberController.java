@@ -72,6 +72,13 @@ public class MemberController {
     @PutMapping("/pt/member")
     @Operation(summary = "사용자 정보 수정", description = "자신의 정보를 수정한다.")
     public void updateMyInfo(@RequestBody @Valid MemberUpdateRequest request){
-        memberService.updateMember(request);
+        memberService.updateMyInfo(request);
+    }
+
+    @PutMapping("/pt/member/{member-id}")
+    @Operation(summary = "회원 상세정보 수정", description = "트레이너가 회원의 상세정보를 수정한다.")
+    public void updateMemberInfo(@PathVariable(name = "member-id") Long id,
+                                 @RequestBody @Valid UpdateMemberMemoRequest request) {
+        memberService.updateMemberMemo(id,request);
     }
 }
