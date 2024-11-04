@@ -153,7 +153,7 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateMember(MemberUpdateRequest request) {
+    public void updateMyInfo(MemberUpdateRequest request) {
         Member member = getMember();
         member.update(request.getName(), request.getAge(), request.getTel());
     }
@@ -180,5 +180,15 @@ public class MemberService {
                 .build();
 
         memberMemoRepository.save(memo);
+    }
+
+    @Transactional
+    public void updateMemberMemo(Long id, UpdateMemberMemoRequest request) {
+        Member member = memberRepository.findById(id).orElseThrow(NotFoundMemberException::new);
+
+        MemberMemo memberMemo = memberMemoRepository.findByMemberEmail(member.getEmail())
+                .orElseThrow(NotFoundMemberException::new);
+
+        memberMemo.update(request.getMemberTarget(), request.getSignificant(), request.getPtStartDate(), request.getPtEndDate());
     }
 }

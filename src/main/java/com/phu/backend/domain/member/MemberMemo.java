@@ -38,4 +38,11 @@ public class MemberMemo extends BaseTimeEntity {
         this.trainer = trainer;
         this.memberEmail = memberEmail;
     }
+
+    public void update(String memberTarget, String significant, LocalDate ptStartDate, LocalDate ptEndDate) {
+        this.memberTarget = memberTarget;
+        this.significant = significant;
+        this.ptStartDate = ptStartDate;
+        this.ptEndDate = ptEndDate;
+    }
 }
