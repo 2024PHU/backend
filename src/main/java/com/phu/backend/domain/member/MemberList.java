@@ -17,15 +17,11 @@ public class MemberList extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "list_id")
     private Long id;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "trainer_id")
     private Member trainer;
-
     private String memberEmail;
-
     private String memberName;
-
     @Builder
     public MemberList(Member trainer, String memberEmail, String memberName) {
         this.trainer = trainer;
