@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.*;
 import com.phu.backend.domain.member.Member;
 import com.phu.backend.domain.member.Part;
 import com.phu.backend.domain.voicefile.VoiceFile;
+import com.phu.backend.dto.voicefile.response.VoiceFileListResponse;
 import com.phu.backend.dto.voicefile.response.VoiceFileResponse;
 import com.phu.backend.exception.member.TrainerRoleException;
 import com.phu.backend.repository.voicefile.VoiceFileRepository;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -98,6 +100,7 @@ public class VoiceFileService {
             voiceFileRepository.save(voiceFile);
 
             return VoiceFileResponse.builder()
+                    .id(voiceFile.getId())
                     .uploadFileUrl(objectUrl)
                     .originalFileName(multipartFile.getOriginalFilename())
                     .uploadFileName(objectName)
@@ -139,5 +142,18 @@ public class VoiceFileService {
         } catch (AmazonServiceException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<VoiceFileListResponse> getList() {
+        Member trainer = memberService.getMember();
+
+        if (!trainer.getPart().equals(Part.TRAINER)) {
+            throw new TrainerRoleException();
+        }
+
+        List<VoiceFile> voiceFiles = voiceFileRepository.findAllByTrainer(trainer);
+
+        return voiceFiles.stream().map(VoiceFileListResponse::new)
+                .collect(Collectors.toList());
     }
 }
