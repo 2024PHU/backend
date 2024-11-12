@@ -4,11 +4,18 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import com.phu.backend.domain.member.Member;
+import com.phu.backend.domain.member.Part;
+import com.phu.backend.domain.voicefile.VoiceFile;
 import com.phu.backend.dto.voicefile.response.VoiceFileResponse;
+import com.phu.backend.exception.member.TrainerRoleException;
+import com.phu.backend.repository.voicefile.VoiceFileRepository;
+import com.phu.backend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -22,10 +29,19 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class VoiceFileService {
     private final AmazonS3Client s3;
+    private final VoiceFileRepository voiceFileRepository;
+    private final MemberService memberService;
     @Value("${ncp.s3.bucket}")
     private String bucketName;
 
+    @Transactional
     public VoiceFileResponse uploadVoiceFile(MultipartFile multipartFile) {
+        Member trainer = memberService.getMember();
+
+        if (!trainer.getPart().equals(Part.TRAINER)) {
+            throw new TrainerRoleException();
+        }
+
         // 객체 이름을 고유하게 생성 (예: UUID 사용)
         String objectName = UUID.randomUUID().toString() + "_" + multipartFile.getOriginalFilename();
 
@@ -72,6 +88,14 @@ public class VoiceFileService {
 
             // 객체 URL 생성
             String objectUrl = s3.getUrl(bucketName, objectName).toString();
+
+            VoiceFile voiceFile = VoiceFile.builder()
+                    .fileName(objectName)
+                    .uploadFileUrl(objectUrl)
+                    .trainer(trainer)
+                    .build();
+
+            voiceFileRepository.save(voiceFile);
 
             return VoiceFileResponse.builder()
                     .uploadFileUrl(objectUrl)
