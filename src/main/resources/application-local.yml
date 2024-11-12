@@ -38,9 +38,20 @@ spring:
             scope:
               - email
               - profile
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
 
 jwt:
   secret: asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf12
   access-token-expiration-minutes: 600000
   refresh-token-expiration-minutes: 6000000
 
+ncp:
+  s3:
+    access-key : ${ACCESS_KEY}
+    secret-key : ${SECRET_KEY}
+    bucket : ${BUCKET}
+    end-point : https://kr.object.ncloudstorage.com
+    region-name : kr-standard
