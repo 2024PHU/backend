@@ -25,7 +25,7 @@ jobs:
 
       - name: Decode keystore file
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.p12          
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > src/main/resources/keystore.p12
 
       - name: Build Docker Image
         run: |
