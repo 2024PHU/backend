@@ -3,15 +3,15 @@ name: CD - Deploy to NCP
 on:
   push:
     branches:
-      - devlop  
+      - devlop
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     permissions:
-      contents: read  
-      id-token: write 
+      contents: read
+      id-token: write
 
     steps:
       - name: Checkout Code
@@ -22,6 +22,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+
+      - name: Decode keystore file
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > keystore.p12          
 
       - name: Build Docker Image
         run: |
@@ -39,15 +43,15 @@ jobs:
 
       - name: Deploy to NCP Server via SSH
         env:
-          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}  
-          SERVER_IP: ${{ secrets.SERVER_IP }}  
-          SERVER_USER: ${{ secrets.SERVER_USER }}  
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+          SERVER_IP: ${{ secrets.SERVER_IP }}
+          SERVER_USER: ${{ secrets.SERVER_USER }}
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP << 'EOF'
 
             echo "Navigating to backend directory..."
             cd backend
-            
+          
             echo "Stopping running containers..."
             docker-compose down --volumes --rmi all
 
@@ -59,5 +63,5 @@ jobs:
 
             echo "Starting new containers with docker-compose..."
             docker-compose up -d
-            
+          
           EOF
