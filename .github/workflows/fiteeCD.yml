@@ -49,10 +49,13 @@ jobs:
             cd backend
             
             echo "Stopping running containers..."
-            docker-compose down
+            docker-compose down --volumes --rmi all
 
             echo "Pulling latest Docker image..."
             docker pull rm6208/fitee:latest
+
+            echo "Starting new containers with docker-compose..."
+            docker-compose up -d --build
 
             echo "Starting new containers with docker-compose..."
             docker-compose up -d
