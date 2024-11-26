@@ -22,7 +22,7 @@ FROM openjdk:17
 COPY --from=builder build/libs/*.jar app.jar
 # builder 이미지에서 build/libs/*.jar 파일을 app.jar로 복사
 
-COPY keystore.p12 /app/keystore.p12
+COPY src/main/resources/keystore.p12 /app/keystore.p12
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
