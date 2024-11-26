@@ -44,6 +44,9 @@ jobs:
           SERVER_USER: ${{ secrets.SERVER_USER }}  
         run: |
           sshpass -p "$SERVER_PASSWORD" ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP << 'EOF'
+
+            echo "Navigating to backend directory..."
+            cd backend
             
             echo "Stopping running containers..."
             docker-compose down
