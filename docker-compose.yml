@@ -30,11 +30,9 @@ services:
       - friend-gym
 
   back-end:
+    image: rm6208/fitee:latest
     env_file:
       - .env
-    build:
-      context: .
-      dockerfile: Dockerfile
     container_name: friend-gym
     restart: always
     depends_on:
