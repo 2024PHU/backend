@@ -7,5 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface VoiceFileRepository extends JpaRepository<VoiceFile, Long> {
-    List<VoiceFile> findAllByTrainer(Member member);
+    List<VoiceFile> findAllByTrainerAndMemberId(Member member, Long memberId);
 }
