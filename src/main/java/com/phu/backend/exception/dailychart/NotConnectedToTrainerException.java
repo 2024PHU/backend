@@ -10,6 +10,6 @@ public class NotConnectedToTrainerException extends GlobalException {
         return "D004";
     }
     public NotConnectedToTrainerException() {
-        super(MESSAGE, HttpStatus.BAD_REQUEST);
+        super(MESSAGE, HttpStatus.NOT_ACCEPTABLE);
     }
 }
