@@ -6,10 +6,7 @@ import com.phu.backend.service.voicefile.VoiceFileService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -18,15 +15,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VoiceFileController {
     private final VoiceFileService voiceFileService;
-    @PostMapping("/pt/voice-file")
+    @PostMapping("/pt/voice-file/{member-id}")
     @Operation(summary = "음성파일 업로드", description = "음성파일을 업로드한다")
-    public ResponseEntity<VoiceFileResponse> uploadVoiceFile(@RequestPart(value = "file", required = false) MultipartFile multipartFile) {
-        return ResponseEntity.ok().body(voiceFileService.uploadVoiceFile(multipartFile));
+    public ResponseEntity<VoiceFileResponse> uploadVoiceFile(@PathVariable(name = "member-id") Long id,
+            @RequestPart(value = "file", required = false) MultipartFile multipartFile) {
+        return ResponseEntity.ok().body(voiceFileService.uploadVoiceFile(multipartFile, id));
     }
 
-    @GetMapping("/pt/voice-file")
-    @Operation(summary = "저장된 음성파일 리스트 조회", description = "저장된 음성파일 리스트를 전체조회한다.")
-    public ResponseEntity<List<VoiceFileListResponse>> getVoiceFileList() {
-        return ResponseEntity.ok().body(voiceFileService.getList());
+    @GetMapping("/pt/voice-file/{member-id}")
+    @Operation(summary = "연결된 회원과의 음성파일 리스트 조회", description = "저장된 음성파일 리스트를 전체조회한다.")
+    public ResponseEntity<List<VoiceFileListResponse>> getVoiceFileList(@PathVariable(name = "member-id") Long id) {
+        return ResponseEntity.ok().body(voiceFileService.getList(id));
     }
 }

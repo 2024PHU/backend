@@ -55,3 +55,6 @@ ncp:
     bucket : ${BUCKET}
     end-point : https://kr.object.ncloudstorage.com
     region-name : kr-standard
+  clova:
+    invoke-url : ${INVOKE_URL}
+    clova-secret-key : ${CLOVA_SECRET_KEY}
