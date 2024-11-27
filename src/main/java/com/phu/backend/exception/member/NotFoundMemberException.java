@@ -10,6 +10,6 @@ public class NotFoundMemberException extends GlobalException {
         return "M003";
     }
     public NotFoundMemberException() {
-        super(MESSAGE, HttpStatus.BAD_REQUEST);
+        super(MESSAGE, HttpStatus.NOT_ACCEPTABLE);
     }
 }

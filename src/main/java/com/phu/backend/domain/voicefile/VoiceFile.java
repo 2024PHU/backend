@@ -20,11 +20,13 @@ public class VoiceFile extends BaseTimeEntity {
     private String uploadFileUrl;
     @ManyToOne(fetch = FetchType.LAZY)
     private Member trainer;
+    private Long memberId;
 
     @Builder
-    public VoiceFile(String fileName, String uploadFileUrl, Member trainer) {
+    public VoiceFile(String fileName, String uploadFileUrl, Member trainer, Long memberId) {
         this.fileName = fileName;
         this.uploadFileUrl = uploadFileUrl;
         this.trainer = trainer;
+        this.memberId = memberId;
     }
 }

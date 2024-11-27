@@ -10,6 +10,6 @@ public class NotFoundChartException extends GlobalException {
         return "D002";
     }
     public NotFoundChartException() {
-        super(MESSAGE, HttpStatus.BAD_REQUEST);
+        super(MESSAGE, HttpStatus.NOT_ACCEPTABLE);
     }
 }

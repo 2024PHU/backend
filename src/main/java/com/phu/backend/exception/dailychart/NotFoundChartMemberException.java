@@ -10,6 +10,6 @@ public class NotFoundChartMemberException extends GlobalException {
         return "D003";
     }
     public NotFoundChartMemberException() {
-        super(MESSAGE, HttpStatus.BAD_REQUEST);
+        super(MESSAGE, HttpStatus.NOT_ACCEPTABLE);
     }
 }

@@ -10,6 +10,6 @@ public class BranchIsNotValidException extends GlobalException {
         return "D001";
     }
     public BranchIsNotValidException() {
-        super(MESSAGE, HttpStatus.BAD_REQUEST);
+        super(MESSAGE, HttpStatus.NOT_ACCEPTABLE);
     }
 }

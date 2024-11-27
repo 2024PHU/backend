@@ -37,7 +37,7 @@ public class VoiceFileService {
     private String bucketName;
 
     @Transactional
-    public VoiceFileResponse uploadVoiceFile(MultipartFile multipartFile) {
+    public VoiceFileResponse uploadVoiceFile(MultipartFile multipartFile, Long id) {
         Member trainer = memberService.getMember();
 
         if (!trainer.getPart().equals(Part.TRAINER)) {
@@ -95,6 +95,7 @@ public class VoiceFileService {
                     .fileName(objectName)
                     .uploadFileUrl(objectUrl)
                     .trainer(trainer)
+                    .memberId(id)
                     .build();
 
             voiceFileRepository.save(voiceFile);
@@ -105,6 +106,7 @@ public class VoiceFileService {
                     .originalFileName(multipartFile.getOriginalFilename())
                     .uploadFileName(objectName)
                     .message("SUCCESS")
+                    .memberId(id)
                     .build();
 
         } catch (AmazonServiceException e) {
@@ -144,14 +146,14 @@ public class VoiceFileService {
         }
     }
 
-    public List<VoiceFileListResponse> getList() {
+    public List<VoiceFileListResponse> getList(Long memberId) {
         Member trainer = memberService.getMember();
 
         if (!trainer.getPart().equals(Part.TRAINER)) {
             throw new TrainerRoleException();
         }
 
-        List<VoiceFile> voiceFiles = voiceFileRepository.findAllByTrainer(trainer);
+        List<VoiceFile> voiceFiles = voiceFileRepository.findAllByTrainerAndMemberId(trainer, memberId);
 
         return voiceFiles.stream().map(VoiceFileListResponse::new)
                 .collect(Collectors.toList());
