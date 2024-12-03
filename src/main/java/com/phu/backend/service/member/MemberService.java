@@ -123,13 +123,14 @@ public class MemberService {
                 .orElseThrow(NotFoundMemberException::new);
 
         return MemberMemoResponse.builder()
-                .id(member.getId())
+                .memberId(member.getId())
                 .memberName(memberMemo.getMemberName())
                 .memberAge(memberMemo.getMemberAge())
                 .memberTarget(memberMemo.getMemberTarget())
                 .significant(memberMemo.getSignificant())
                 .ptStartDate(memberMemo.getPtStartDate())
                 .ptEndDate(memberMemo.getPtEndDate())
+                .tel(member.getTel())
                 .build();
     }
 
