@@ -135,10 +135,11 @@ public class MemberService {
 
     public List<MemberInfoResponse> getMyMemberInfoList() {
         Member member = getMember();
+        String tel = member.getTel();
 
         List<MemberList> list = memberListRepository.findAllByTrainer(member);
 
-        return list.stream().map(MemberInfoResponse::new).collect(Collectors.toList());
+        return list.stream().map(memberList -> new MemberInfoResponse(memberList, tel)).collect(Collectors.toList());
     }
 
     @Transactional
