@@ -1,4 +1,4 @@
-name: CI with Gradle
+name: CI - With Gradle
 
 on:
   pull_request:
@@ -31,4 +31,4 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build With Gradle (Skipping Tests)
-        run: ./gradle
+        run: ./gradlew build -x test
