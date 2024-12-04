@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 public class VoiceFileResponse {
     private Long fileId;
     private String originalFileName;
+    private String voiceFileId;
     private String uploadFileName;
     private String uploadFileUrl;
     private String message;
@@ -16,9 +17,10 @@ public class VoiceFileResponse {
     private Boolean isTransformation;
 
     @Builder
-    public VoiceFileResponse(Long fileId, String originalFileName, String uploadFileName, String uploadFileUrl, String message, Long memberId, Boolean isTransformation) {
+    public VoiceFileResponse(Long fileId, String originalFileName, String voiceFileId, String uploadFileName, String uploadFileUrl, String message, Long memberId, Boolean isTransformation) {
         this.fileId = fileId;
         this.originalFileName = originalFileName;
+        this.voiceFileId = voiceFileId;
         this.uploadFileName = uploadFileName;
         this.uploadFileUrl = uploadFileUrl;
         this.message = message;
