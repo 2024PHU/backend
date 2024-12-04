@@ -9,9 +9,11 @@ import com.phu.backend.domain.voicefile.VoiceFile;
 import com.phu.backend.dto.clova.ClovaSpeechRequest;
 import com.phu.backend.dto.clova.ClovaSpeechResponse;
 import com.phu.backend.dto.clova.ClovaSpeechResponseList;
+import com.phu.backend.exception.dailychart.NotFoundChartMemberException;
 import com.phu.backend.exception.member.NotFoundMemberException;
 import com.phu.backend.exception.voicefile.NotFoundFileException;
 import com.phu.backend.repository.clovavoicetext.ClovaVoiceTextRepository;
+import com.phu.backend.repository.member.MemberListRepository;
 import com.phu.backend.repository.member.MemberRepository;
 import com.phu.backend.repository.voicefile.VoiceFileRepository;
 import com.phu.backend.service.member.MemberService;
@@ -37,6 +39,7 @@ public class ClovaService {
     private final VoiceFileRepository voiceFileRepository;
     private final RestTemplate restTemplate;
     private final MemberRepository memberRepository;
+    private final MemberListRepository memberListRepository;
     private final ClovaVoiceTextRepository clovaVoiceTextRepository;
     private final MemberService memberService;
     @Value("${ncp.clova.invoke-url}")
@@ -49,6 +52,9 @@ public class ClovaService {
         Long trainerId = trainer.getId();
 
         Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
+
+        memberListRepository.findByTrainerAndMemberEmail(trainer, member.getEmail())
+                .orElseThrow(NotFoundChartMemberException::new);
 
         VoiceFile voiceFile = voiceFileRepository.findById(fileId).orElseThrow(NotFoundFileException::new);
         String domainPath = "/";
@@ -88,6 +94,7 @@ public class ClovaService {
         clovaVoiceTextRepository.save(voiceText);
 
         voiceFile.enableTransformation();
+        voiceFile.confirmVoiceFileId(String.valueOf(uuid));
 
         return ClovaSpeechResponseList.builder()
                 .memberName(member.getName())

@@ -30,9 +30,9 @@ public class VoiceFileController {
         return ResponseEntity.ok().body(voiceFileService.getList(id));
     }
 
-    @GetMapping("/pt/voice-file/result/{voice-file-id}/{voice-list-id}")
+    @GetMapping("/pt/voice-file/result/{voice-file-id}/{voice-text-id}")
     @Operation(summary = "음성녹음 텍스트 결과 조회", description = "추출한 음성파일 텍스트를 조회한다.")
-    public ResponseEntity<ClovaSpeechResponseList> getVoiceFileList(@PathVariable(name = "voice-list-id") UUID voiceId,
+    public ResponseEntity<ClovaSpeechResponseList> getVoiceFileList(@PathVariable(name = "voice-text-id") UUID voiceId,
                                                                     @PathVariable(name = "voice-file-id") Long fileId) {
         return ResponseEntity.ok().body(voiceFileService.getVoiceText(voiceId, fileId));
     }

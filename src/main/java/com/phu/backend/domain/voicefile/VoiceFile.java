@@ -21,17 +21,23 @@ public class VoiceFile extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private Member trainer;
     private Long memberId;
+    private String voiceTextId;
     private Boolean isTransformation;
 
     public void enableTransformation() {
         this.isTransformation = true;
     }
+
+    public void confirmVoiceFileId(String id) {
+        this.voiceTextId = id;
+    }
     @Builder
-    public VoiceFile(String fileName, String uploadFileUrl, Member trainer, Long memberId, Boolean isTransformation) {
+    public VoiceFile(String fileName, String uploadFileUrl, Member trainer, Long memberId, String voiceTextId, Boolean isTransformation) {
         this.fileName = fileName;
         this.uploadFileUrl = uploadFileUrl;
         this.trainer = trainer;
         this.memberId = memberId;
+        this.voiceTextId = voiceTextId;
         this.isTransformation = isTransformation;
     }
 }
