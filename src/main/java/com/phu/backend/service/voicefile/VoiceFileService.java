@@ -11,11 +11,13 @@ import com.phu.backend.domain.voicefile.VoiceFile;
 import com.phu.backend.dto.clova.ClovaSpeechResponseList;
 import com.phu.backend.dto.voicefile.response.VoiceFileListResponse;
 import com.phu.backend.dto.voicefile.response.VoiceFileResponse;
+import com.phu.backend.exception.dailychart.NotFoundChartMemberException;
 import com.phu.backend.exception.member.NotFoundMemberException;
 import com.phu.backend.exception.member.TrainerRoleException;
 import com.phu.backend.exception.voicefile.NotFoundFileException;
 import com.phu.backend.exception.voicefile.NotFoundVoiceDataException;
 import com.phu.backend.repository.clovavoicetext.ClovaVoiceTextRepository;
+import com.phu.backend.repository.member.MemberListRepository;
 import com.phu.backend.repository.member.MemberRepository;
 import com.phu.backend.repository.voicefile.VoiceFileRepository;
 import com.phu.backend.service.member.MemberService;
@@ -40,6 +42,8 @@ public class VoiceFileService {
     private final AmazonS3Client s3;
     private final VoiceFileRepository voiceFileRepository;
     private final MemberService memberService;
+
+    private final MemberListRepository memberListRepository;
     private final MemberRepository memberRepository;
     private final ClovaVoiceTextRepository clovaVoiceTextRepository;
     @Value("${ncp.s3.bucket}")
@@ -52,6 +56,10 @@ public class VoiceFileService {
         if (!trainer.getPart().equals(Part.TRAINER)) {
             throw new TrainerRoleException();
         }
+        Member member = memberRepository.findById(id).orElseThrow(NotFoundMemberException::new);
+
+        memberListRepository.findByTrainerAndMemberEmail(trainer, member.getEmail())
+                .orElseThrow(NotFoundChartMemberException::new);
 
         // 객체 이름을 고유하게 생성 (예: UUID 사용)
         String objectName = UUID.randomUUID().toString() + "_" + multipartFile.getOriginalFilename();
@@ -104,6 +112,7 @@ public class VoiceFileService {
                     .fileName(objectName)
                     .uploadFileUrl(objectUrl)
                     .trainer(trainer)
+                    .voiceTextId("Before Conversion")
                     .memberId(id)
                     .isTransformation(false)
                     .build();
@@ -113,6 +122,7 @@ public class VoiceFileService {
             return VoiceFileResponse.builder()
                     .fileId(voiceFile.getId())
                     .uploadFileUrl(objectUrl)
+                    .voiceFileId(voiceFile.getVoiceTextId())
                     .originalFileName(multipartFile.getOriginalFilename())
                     .uploadFileName(objectName)
                     .message("SUCCESS")
@@ -166,8 +176,7 @@ public class VoiceFileService {
 
         List<VoiceFile> voiceFiles = voiceFileRepository.findAllByTrainerAndMemberId(trainer, memberId);
 
-        return voiceFiles.stream().map(VoiceFileListResponse::new)
-                .collect(Collectors.toList());
+        return voiceFiles.stream().map(voiceFile -> new VoiceFileListResponse(voiceFile,voiceFile.getVoiceTextId())).collect(Collectors.toList());
     }
 
     public ClovaSpeechResponseList getVoiceText(UUID voiceId, Long fileId) {
