@@ -169,4 +169,21 @@ public class VoiceFileService {
         return voiceFiles.stream().map(VoiceFileListResponse::new)
                 .collect(Collectors.toList());
     }
+
+    public ClovaSpeechResponseList getVoiceText(UUID voiceId, Long fileId) {
+        ClovaVoiceText clovaVoiceText = clovaVoiceTextRepository.findById(voiceId)
+                .orElseThrow(NotFoundVoiceDataException::new);
+
+        Member member = memberRepository.findById(clovaVoiceText.getMemberId())
+                .orElseThrow(NotFoundMemberException::new);
+
+        VoiceFile voiceFile = voiceFileRepository.findById(fileId).orElseThrow(NotFoundFileException::new);
+
+        return ClovaSpeechResponseList.builder()
+                .voiceListId(clovaVoiceText.getId())
+                .list(clovaVoiceText.getVoiceList())
+                .memberName(member.getName())
+                .createAt(voiceFile.getCreatedAt())
+                .build();
+    }
 }
