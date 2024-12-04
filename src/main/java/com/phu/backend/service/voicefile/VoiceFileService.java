@@ -4,12 +4,19 @@ import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.*;
+import com.phu.backend.domain.clovavoicetext.ClovaVoiceText;
 import com.phu.backend.domain.member.Member;
 import com.phu.backend.domain.member.Part;
 import com.phu.backend.domain.voicefile.VoiceFile;
+import com.phu.backend.dto.clova.ClovaSpeechResponseList;
 import com.phu.backend.dto.voicefile.response.VoiceFileListResponse;
 import com.phu.backend.dto.voicefile.response.VoiceFileResponse;
+import com.phu.backend.exception.member.NotFoundMemberException;
 import com.phu.backend.exception.member.TrainerRoleException;
+import com.phu.backend.exception.voicefile.NotFoundFileException;
+import com.phu.backend.exception.voicefile.NotFoundVoiceDataException;
+import com.phu.backend.repository.clovavoicetext.ClovaVoiceTextRepository;
+import com.phu.backend.repository.member.MemberRepository;
 import com.phu.backend.repository.voicefile.VoiceFileRepository;
 import com.phu.backend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +40,8 @@ public class VoiceFileService {
     private final AmazonS3Client s3;
     private final VoiceFileRepository voiceFileRepository;
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
+    private final ClovaVoiceTextRepository clovaVoiceTextRepository;
     @Value("${ncp.s3.bucket}")
     private String bucketName;
 
@@ -96,17 +105,19 @@ public class VoiceFileService {
                     .uploadFileUrl(objectUrl)
                     .trainer(trainer)
                     .memberId(id)
+                    .isTransformation(false)
                     .build();
 
             voiceFileRepository.save(voiceFile);
 
             return VoiceFileResponse.builder()
-                    .id(voiceFile.getId())
+                    .fileId(voiceFile.getId())
                     .uploadFileUrl(objectUrl)
                     .originalFileName(multipartFile.getOriginalFilename())
                     .uploadFileName(objectName)
                     .message("SUCCESS")
                     .memberId(id)
+                    .isTransformation(voiceFile.getIsTransformation())
                     .build();
 
         } catch (AmazonServiceException e) {
