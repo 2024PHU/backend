@@ -8,8 +8,11 @@ import com.phu.backend.domain.member.Member;
 import com.phu.backend.domain.voicefile.VoiceFile;
 import com.phu.backend.dto.clova.ClovaSpeechRequest;
 import com.phu.backend.dto.clova.ClovaSpeechResponse;
+import com.phu.backend.dto.clova.ClovaSpeechResponseList;
+import com.phu.backend.exception.member.NotFoundMemberException;
 import com.phu.backend.exception.voicefile.NotFoundFileException;
 import com.phu.backend.repository.clovavoicetext.ClovaVoiceTextRepository;
+import com.phu.backend.repository.member.MemberRepository;
 import com.phu.backend.repository.voicefile.VoiceFileRepository;
 import com.phu.backend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +36,7 @@ import java.util.UUID;
 public class ClovaService {
     private final VoiceFileRepository voiceFileRepository;
     private final RestTemplate restTemplate;
+    private final MemberRepository memberRepository;
     private final ClovaVoiceTextRepository clovaVoiceTextRepository;
     private final MemberService memberService;
     @Value("${ncp.clova.invoke-url}")
@@ -40,9 +44,11 @@ public class ClovaService {
     @Value("${ncp.clova.clova-secret-key}")
     private String clovaSecret;
 
-    public List<ClovaSpeechResponse> clovaSpeech(Long fileId, Long memberId) throws JsonProcessingException {
-        Member member = memberService.getMember();
-        Long trainerId = member.getId();
+    public ClovaSpeechResponseList clovaSpeech(Long fileId, Long memberId) throws JsonProcessingException {
+        Member trainer = memberService.getMember();
+        Long trainerId = trainer.getId();
+
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
         VoiceFile voiceFile = voiceFileRepository.findById(fileId).orElseThrow(NotFoundFileException::new);
         String domainPath = "/";
@@ -67,9 +73,29 @@ public class ClovaService {
 
         ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, httpEntity, String.class);
         String voiceResponse = response.getBody();
-        return parseClovaSpeechResponse(voiceResponse, trainerId, memberId);
-    }
 
+        List<ClovaSpeechResponse> responses = parseClovaSpeechResponse(voiceResponse, trainerId, memberId);
+
+        UUID uuid = UUID.randomUUID();
+
+        ClovaVoiceText voiceText = ClovaVoiceText.builder()
+                .id(uuid)
+                .voiceList(responses)
+                .memberId(memberId)
+                .trainerId(trainerId)
+                .build();
+
+        clovaVoiceTextRepository.save(voiceText);
+
+        voiceFile.enableTransformation();
+
+        return ClovaSpeechResponseList.builder()
+                .memberName(member.getName())
+                .list(responses)
+                .createAt(voiceFile.getCreatedAt())
+                .voiceListId(uuid)
+                .build();
+    }
 
     private String extractDataKey(String fullPath, String domainPath) {
         try {
@@ -102,18 +128,9 @@ public class ClovaService {
                     .text(text)
                     .build();
 
-            UUID uuid = UUID.randomUUID();
-
-            ClovaVoiceText clovaVoiceText = ClovaVoiceText.builder()
-                    .id(uuid)
-                    .trainerId(trainerId)
-                    .memberId(memberId)
-                    .speaker(speaker)
-                    .text(text)
-                    .build();
-            clovaVoiceTextRepository.save(clovaVoiceText);
             responses.add(clovaSpeechResponse);
         }
+
         return responses;
     }
 }
