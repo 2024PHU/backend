@@ -29,6 +29,12 @@ public class DailyChart extends BaseTimeEntity {
 //    @OneToMany(mappedBy = "DailyChart")
 //    private List<DailyChart> routines;
         //TODO 사진추가
+
+    public void updateChart(LocalDate chartDate, Integer weight, String memo) {
+        this.chartDate = chartDate;
+        this.weight = weight;
+        this.memo = memo;
+    }
     @Builder
     public DailyChart(Branch branch, Integer weight, String memo, Member trainer, String memberEmail, LocalDate chartDate) {
         this.branch = branch;
