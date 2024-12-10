@@ -10,12 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class MemberDailyChartRequest {
+public class DailyChartRequest {
     @NotNull(message = "운동 기록 날짜를 입력해주세요")
     @Schema(description = "운동 날짜", nullable = false, example = "2024-10-29")
     private LocalDate chartDate;
     private Integer weight;
     private String memo;
-    @NotNull(message = "어느 부위를 운동했는지 기록하세요")
+    @NotNull
     private List<ExerciseArea> routines = new ArrayList<>();
 }
