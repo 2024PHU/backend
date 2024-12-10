@@ -7,11 +7,9 @@ import com.phu.backend.domain.dailychart.Routine;
 import com.phu.backend.domain.member.Member;
 import com.phu.backend.domain.member.MemberList;
 import com.phu.backend.domain.member.Part;
-import com.phu.backend.dto.dailychart.request.MemberDailyChartRequest;
-import com.phu.backend.dto.dailychart.request.PtDailyChartRequest;
+import com.phu.backend.dto.dailychart.request.DailyChartRequest;
 import com.phu.backend.dto.dailychart.response.DailyChartListResponse;
 import com.phu.backend.dto.dailychart.response.DailyChartResponse;
-import com.phu.backend.exception.dailychart.BranchIsNotValidException;
 import com.phu.backend.exception.dailychart.NotConnectedToTrainerException;
 import com.phu.backend.exception.dailychart.NotFoundChartException;
 import com.phu.backend.exception.dailychart.NotFoundChartMemberException;
@@ -40,17 +38,14 @@ public class DailyChartService {
     private final MemberService memberService;
 
     @Transactional
-    public Long addChartPt(PtDailyChartRequest request) {
-        if (request.getBranch().equals(Branch.PERSONAL)) {
-            throw new BranchIsNotValidException();
-        }
+    public Long addChartPt(DailyChartRequest request, Long memberId) {
         Member trainer = memberService.getMember();
 
         if (trainer.getPart().equals(Part.MEMBER)) {
             throw new TrainerRoleException();
         }
 
-        Member member = memberRepository.findById(request.getId())
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(NotFoundMemberException::new);
 
         if (member.getId().equals(trainer.getId())) {
@@ -64,7 +59,7 @@ public class DailyChartService {
                 .chartDate(request.getChartDate())
                 .trainer(trainer)
                 .memberEmail(member.getEmail())
-                .branch(request.getBranch())
+                .branch(Branch.PT)
                 .weight(request.getWeight())
                 .memo(request.getMemo())
                 .build();
@@ -103,9 +98,10 @@ public class DailyChartService {
     }
 
     @Transactional
-    public Long addChartMember(MemberDailyChartRequest request) {
+    public Long addChartMember(DailyChartRequest request) {
         Member member = memberService.getMember();
 
+        // 피티 검증
         MemberList memberList = memberListRepository.findByMemberEmail(member.getEmail())
                 .orElseThrow(NotConnectedToTrainerException::new);
 
