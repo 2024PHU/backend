@@ -1,6 +1,7 @@
 package com.phu.backend.controller.dailychart;
 
 import com.phu.backend.dto.dailychart.request.DailyChartRequest;
+import com.phu.backend.dto.dailychart.request.UpdateDailyChartRequest;
 import com.phu.backend.dto.dailychart.response.DailyChartListResponse;
 import com.phu.backend.dto.dailychart.response.DailyChartResponse;
 import com.phu.backend.service.dailychart.DailyChartService;
@@ -39,7 +40,14 @@ public class DailyChartController {
 
     @GetMapping("/chart/all/{member-id}")
     @Operation(summary = "회원별 데일리 차트 전체조회", description = "회원별 데일리 차트를 전체조회한다.")
-    public ResponseEntity<List<DailyChartListResponse>> getAllDailyChart(@PathVariable(name = "member-id") Long id) {
-        return ResponseEntity.ok().body(dailyChartService.getAllDailyCart(id));
+    public ResponseEntity<List<DailyChartListResponse>> getAllDailyChart(@PathVariable(name = "member-id") Long memberId) {
+        return ResponseEntity.ok().body(dailyChartService.getAllDailyCart(memberId));
+    }
+
+    @PutMapping("/chart/{chart-id}")
+    @Operation(summary = "데일리차트 수정", description = "작성한 데일리 차트를 수정한다.")
+    public void updateDailyChart(@RequestBody @Valid UpdateDailyChartRequest request,
+                                 @PathVariable(name = "chart-id") Long chartId) {
+        dailyChartService.updateDailyChart(request,chartId);
     }
 }

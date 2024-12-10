@@ -18,6 +18,10 @@ public class Routine {
     private ExerciseArea routine;
     @ManyToOne(fetch = FetchType.LAZY)
     private DailyChart dailyChart;
+
+    public void updateRoutine(ExerciseArea routine) {
+        this.routine = routine;
+    }
     @Builder
     public Routine(ExerciseArea routine, DailyChart dailyChart) {
         this.routine = routine;
