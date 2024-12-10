@@ -1,7 +1,6 @@
 package com.phu.backend.controller.dailychart;
 
-import com.phu.backend.dto.dailychart.request.MemberDailyChartRequest;
-import com.phu.backend.dto.dailychart.request.PtDailyChartRequest;
+import com.phu.backend.dto.dailychart.request.DailyChartRequest;
 import com.phu.backend.dto.dailychart.response.DailyChartListResponse;
 import com.phu.backend.dto.dailychart.response.DailyChartResponse;
 import com.phu.backend.service.dailychart.DailyChartService;
