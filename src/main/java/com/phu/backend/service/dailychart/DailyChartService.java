@@ -8,12 +8,14 @@ import com.phu.backend.domain.member.Member;
 import com.phu.backend.domain.member.MemberList;
 import com.phu.backend.domain.member.Part;
 import com.phu.backend.dto.dailychart.request.DailyChartRequest;
+import com.phu.backend.dto.dailychart.request.UpdateDailyChartRequest;
 import com.phu.backend.dto.dailychart.response.DailyChartListResponse;
 import com.phu.backend.dto.dailychart.response.DailyChartResponse;
 import com.phu.backend.exception.dailychart.NotConnectedToTrainerException;
 import com.phu.backend.exception.dailychart.NotFoundChartException;
 import com.phu.backend.exception.dailychart.NotFoundChartMemberException;
 import com.phu.backend.exception.member.MemberDuplicationException;
+import com.phu.backend.exception.member.MemberRoleException;
 import com.phu.backend.exception.member.NotFoundMemberException;
 import com.phu.backend.exception.member.TrainerRoleException;
 import com.phu.backend.repository.dailychart.DailyChartRepository;
@@ -162,6 +164,36 @@ public class DailyChartService {
                         response.confirmRoutines(exerciseAreas);
                         return response;
                     } ).collect(Collectors.toList());
+        }
+    }
+    @Transactional
+    public void updateDailyChart(UpdateDailyChartRequest request, Long chartId) {
+        DailyChart dailyChart = dailyChartRepository.findById(chartId)
+                .orElseThrow(NotFoundChartException::new);
+
+        Member member = memberService.getMember();
+        Part part = member.getPart();
+
+        // 회원의 개인운동 차트를 트레이너가 수정하려는 경우
+        if (dailyChart.getBranch().equals(Branch.PERSONAL) && part.equals(Part.TRAINER)) {
+            throw new MemberRoleException();
+        }
+        // 트레이너가 쓴 회원 데일리차트를 회원이 수정하려는 경우
+        if (dailyChart.getBranch().equals(Branch.PT) && part.equals(Part.MEMBER)) {
+            throw new TrainerRoleException();
+        }
+
+        dailyChart.updateChart(request.getChartDate(), request.getWeight(), request.getMemo());
+
+        List<Routine> routines = routineRepository.findAllByDailyChart(dailyChart);
+        routineRepository.deleteAll(routines);
+
+        for (ExerciseArea exerciseArea : request.getRoutines()) {
+            Routine routine = Routine.builder()
+                    .routine(exerciseArea)
+                    .dailyChart(dailyChart)
+                    .build();
+            routineRepository.save(routine);
         }
     }
 }
