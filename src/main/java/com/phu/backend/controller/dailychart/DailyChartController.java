@@ -19,22 +19,23 @@ import java.util.List;
 @Tag(name = "데일리차트 서비스 API", description = "데일리차트와 관련된 서비스를 제공하는 API")
 public class DailyChartController {
     private final DailyChartService dailyChartService;
-    @PostMapping("/pt/chart")
+    @PostMapping("/pt/chart/{member-id}")
     @Operation(summary = "트레이너 -> 회원 데일리 차트 생성", description = "PT후 트레이너가 회원의 데일리 차트를 생성한다.")
-    public ResponseEntity<Long> addChartPt(@RequestBody @Valid PtDailyChartRequest request) {
-        return ResponseEntity.ok().body(dailyChartService.addChartPt(request));
+    public ResponseEntity<Long> addChartPt(@RequestBody @Valid DailyChartRequest request,
+                                           @PathVariable(name = "member-id") Long memberId) {
+        return ResponseEntity.ok().body(dailyChartService.addChartPt(request, memberId));
     }
 
     @PostMapping("/member/chart")
     @Operation(summary = "회원(개인운동) 데일리 차트 생성", description = "회원이 개인운동 후 데일리 차트를 생성한다.")
-    public ResponseEntity<Long> addChartMember(@RequestBody @Valid MemberDailyChartRequest request) {
+    public ResponseEntity<Long> addChartMember(@RequestBody @Valid DailyChartRequest request) {
         return ResponseEntity.ok().body(dailyChartService.addChartMember(request));
     }
 
     @GetMapping("/chart/{chart-id}")
     @Operation(summary = "데일리 차트 조회", description = "사용자가 데일리 차트를 상세조회한다.")
-    public ResponseEntity<DailyChartResponse> getDailyChart(@PathVariable(name = "chart-id") Long id) {
-        return ResponseEntity.ok().body(dailyChartService.getDailyCart(id));
+    public ResponseEntity<DailyChartResponse> getDailyChart(@PathVariable(name = "chart-id") Long chartId) {
+        return ResponseEntity.ok().body(dailyChartService.getDailyCart(chartId));
     }
 
     @GetMapping("/chart/all/{member-id}")
