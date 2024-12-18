@@ -50,4 +50,10 @@ public class DailyChartController {
                                  @PathVariable(name = "chart-id") Long chartId) {
         dailyChartService.updateDailyChart(request,chartId);
     }
+
+    @DeleteMapping("/chart/{chart-id}")
+    @Operation(summary = "데일리차트 삭제", description = "작성한 데일리 차트를 삭제한다.")
+    public void deleteDailyChart(@PathVariable(name = "chart-id") Long chartId) {
+        dailyChartService.deleteDailyChart(chartId);
+    }
 }
