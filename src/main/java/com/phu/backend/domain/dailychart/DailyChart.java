@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,9 +28,8 @@ public class DailyChart extends BaseTimeEntity {
     private Member trainer;
     private String memberEmail;
     private LocalDate chartDate;
-//    @OneToMany(mappedBy = "DailyChart")
-//    private List<DailyChart> routines;
-        //TODO 사진추가
+    @OneToMany(mappedBy = "dailyChart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Routine> routines = new ArrayList<>();
 
     public void updateChart(LocalDate chartDate, Integer weight, String memo) {
         this.chartDate = chartDate;
