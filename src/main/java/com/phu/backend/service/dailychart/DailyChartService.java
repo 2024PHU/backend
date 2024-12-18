@@ -196,4 +196,22 @@ public class DailyChartService {
             routineRepository.save(routine);
         }
     }
+
+    @Transactional
+    public void deleteDailyChart(Long chartId) {
+        Member member = memberService.getMember();
+        Part part = member.getPart();
+
+        DailyChart dailyChart = dailyChartRepository.findById(chartId)
+                .orElseThrow(NotFoundChartException::new);
+
+        if (part.equals(Part.TRAINER) && dailyChart.getBranch().equals(Branch.PERSONAL)) {
+            throw new MemberRoleException();
+        }
+        if (part.equals(Part.MEMBER) && dailyChart.getBranch().equals(Branch.PT)) {
+            throw new TrainerRoleException();
+        }
+
+        dailyChartRepository.delete(dailyChart);
+    }
 }
