@@ -1,4 +1,4 @@
-package com.phu.backend.dto.clova;
+package com.phu.backend.dto.clova.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
