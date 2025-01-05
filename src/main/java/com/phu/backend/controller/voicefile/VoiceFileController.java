@@ -1,6 +1,6 @@
 package com.phu.backend.controller.voicefile;
 
-import com.phu.backend.dto.clova.ClovaSpeechResponseList;
+import com.phu.backend.dto.clova.response.ClovaSpeechResponseList;
 import com.phu.backend.dto.voicefile.response.VoiceFileListResponse;
 import com.phu.backend.dto.voicefile.response.VoiceFileResponse;
 import com.phu.backend.service.voicefile.VoiceFileService;

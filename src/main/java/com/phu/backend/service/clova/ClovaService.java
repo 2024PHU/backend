@@ -6,9 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phu.backend.domain.clovavoicetext.ClovaVoiceText;
 import com.phu.backend.domain.member.Member;
 import com.phu.backend.domain.voicefile.VoiceFile;
-import com.phu.backend.dto.clova.ClovaSpeechRequest;
-import com.phu.backend.dto.clova.ClovaSpeechResponse;
-import com.phu.backend.dto.clova.ClovaSpeechResponseList;
+import com.phu.backend.dto.clova.reqeust.ClovaMessage;
+import com.phu.backend.dto.clova.reqeust.ClovaSpeechRequest;
+import com.phu.backend.dto.clova.reqeust.ClovaXRequestList;
+import com.phu.backend.dto.clova.response.ClovaSpeechResponse;
+import com.phu.backend.dto.clova.response.ClovaSpeechResponseList;
+import com.phu.backend.dto.clova.reqeust.ClovaXRequest;
 import com.phu.backend.exception.dailychart.NotFoundChartMemberException;
 import com.phu.backend.exception.member.NotFoundMemberException;
 import com.phu.backend.exception.voicefile.NotFoundFileException;
@@ -39,6 +42,7 @@ public class ClovaService {
     private final VoiceFileRepository voiceFileRepository;
     private final RestTemplate restTemplate;
     private final MemberRepository memberRepository;
+    private final ObjectMapper objectMapper;
     private final MemberListRepository memberListRepository;
     private final ClovaVoiceTextRepository clovaVoiceTextRepository;
     private final MemberService memberService;
@@ -46,6 +50,12 @@ public class ClovaService {
     private String invokeUrl;
     @Value("${ncp.clova.clova-secret-key}")
     private String clovaSecret;
+    @Value("${ncp.clova.api-url}")
+    private String apiUrl;
+    @Value("${ncp.clova.api-key}")
+    private String apiKey;
+    @Value("${ncp.clova.gateway-key}")
+    private String gatewayKey;
 
     public ClovaSpeechResponseList clovaSpeech(Long fileId, Long memberId) throws JsonProcessingException {
         Member trainer = memberService.getMember();
@@ -139,6 +149,46 @@ public class ClovaService {
         }
 
         return responses;
+    }
+
+    public Object test(ClovaMessage request) throws JsonProcessingException {
+        List<ClovaXRequest> requestList = new ArrayList<>();
+
+        ClovaXRequest clovaXRequest = ClovaXRequest.builder()
+                .role("system")
+                .content(request.getContent())
+                .build();
+        requestList.add(clovaXRequest);
+
+        ClovaXRequestList clovaXRequestList = ClovaXRequestList.builder()
+                .messages(requestList)
+                .build();
+
+        RestTemplate restTemplate = new RestTemplate();
+        String url = apiUrl;
+        HttpHeaders headers = buildHeaders();
+        String body = objectMapper.writeValueAsString(clovaXRequestList);
+        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
+
+        log.info("body:", entity);
+
+        String responseBody = response.getBody();
+
+        JsonNode rootNode = objectMapper.readTree(responseBody);
+        String content = rootNode.path("result").path("message").path("content").asText();
+
+        return content;
+    }
+
+    public HttpHeaders buildHeaders() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("X-NCP-CLOVASTUDIO-API-KEY", apiKey);
+        headers.set("X-NCP-APIGW-API-KEY", gatewayKey);
+
+        return headers;
     }
 }
 

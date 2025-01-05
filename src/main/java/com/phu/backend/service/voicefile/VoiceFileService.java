@@ -8,7 +8,7 @@ import com.phu.backend.domain.clovavoicetext.ClovaVoiceText;
 import com.phu.backend.domain.member.Member;
 import com.phu.backend.domain.member.Part;
 import com.phu.backend.domain.voicefile.VoiceFile;
-import com.phu.backend.dto.clova.ClovaSpeechResponseList;
+import com.phu.backend.dto.clova.response.ClovaSpeechResponseList;
 import com.phu.backend.dto.voicefile.response.VoiceFileListResponse;
 import com.phu.backend.dto.voicefile.response.VoiceFileResponse;
 import com.phu.backend.exception.dailychart.NotFoundChartMemberException;
