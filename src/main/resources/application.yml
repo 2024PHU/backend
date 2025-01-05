@@ -53,6 +53,9 @@ ncp:
   clova:
     invoke-url : ${INVOKE_URL}
     clova-secret-key : ${CLOVA_SECRET_KEY}
+    api-url : ${CLOVA_URL}
+    api-key : ${CLOVA_API_KEY}
+    gateway-key : ${CLOVA_GATEWAY_KEY}
 
 server:
   port: 443
