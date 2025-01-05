@@ -5,19 +5,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.phu.backend.domain.clovavoicetext.ClovaVoiceText;
 import com.phu.backend.domain.member.Member;
+import com.phu.backend.domain.summarization.Summarization;
 import com.phu.backend.domain.voicefile.VoiceFile;
-import com.phu.backend.dto.clova.reqeust.ClovaMessage;
 import com.phu.backend.dto.clova.reqeust.ClovaSpeechRequest;
-import com.phu.backend.dto.clova.reqeust.ClovaXRequestList;
 import com.phu.backend.dto.clova.response.ClovaSpeechResponse;
 import com.phu.backend.dto.clova.response.ClovaSpeechResponseList;
-import com.phu.backend.dto.clova.reqeust.ClovaXRequest;
+import com.phu.backend.dto.summarization.response.SummarizationResponse;
 import com.phu.backend.exception.dailychart.NotFoundChartMemberException;
 import com.phu.backend.exception.member.NotFoundMemberException;
+import com.phu.backend.exception.summarization.NotFoundSummarizationException;
 import com.phu.backend.exception.voicefile.NotFoundFileException;
+import com.phu.backend.exception.voicefile.NotFoundVoiceDataException;
 import com.phu.backend.repository.clovavoicetext.ClovaVoiceTextRepository;
 import com.phu.backend.repository.member.MemberListRepository;
 import com.phu.backend.repository.member.MemberRepository;
+import com.phu.backend.repository.summarization.SummarizationRepository;
 import com.phu.backend.repository.voicefile.VoiceFileRepository;
 import com.phu.backend.service.member.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +46,7 @@ public class ClovaService {
     private final RestTemplate restTemplate;
     private final MemberRepository memberRepository;
     private final ObjectMapper objectMapper;
+    private final SummarizationRepository summarizationRepository;
     private final MemberListRepository memberListRepository;
     private final ClovaVoiceTextRepository clovaVoiceTextRepository;
     private final MemberService memberService;
@@ -151,38 +155,72 @@ public class ClovaService {
         return responses;
     }
 
-    public Object test(ClovaMessage request) throws JsonProcessingException {
-        List<ClovaXRequest> requestList = new ArrayList<>();
+    public SummarizationResponse summationTextFile(UUID textId) throws JsonProcessingException {
+        ClovaVoiceText clovaVoiceText = clovaVoiceTextRepository.findById(textId)
+                .orElseThrow(NotFoundVoiceDataException::new);
 
-        ClovaXRequest clovaXRequest = ClovaXRequest.builder()
-                .role("system")
-                .content(request.getContent())
-                .build();
-        requestList.add(clovaXRequest);
+        Member trainer = memberService.getMember();
 
-        ClovaXRequestList clovaXRequestList = ClovaXRequestList.builder()
-                .messages(requestList)
-                .build();
+        Long memberId = clovaVoiceText.getMemberId();
+        Member member = memberRepository.findById(memberId).orElseThrow(NotFoundMemberException::new);
 
-        RestTemplate restTemplate = new RestTemplate();
-        String url = apiUrl;
+        // 추출한 텍스트 요약본
+        List<ClovaSpeechResponse> voiceList = clovaVoiceText.getVoiceList();
+
+        String[] textArray = voiceList.stream()
+                .map(response -> response.getSpeaker() + ": " + response.getText())
+                .toArray(String[]::new);
+
+        HashMap<String, String[]> bodyMap = new HashMap<>();
+        bodyMap.put("texts", textArray);
+        String texts = objectMapper.writeValueAsString(bodyMap);
         HttpHeaders headers = buildHeaders();
-        String body = objectMapper.writeValueAsString(clovaXRequestList);
-        HttpEntity<String> entity = new HttpEntity<>(body, headers);
+        HttpEntity<String> entity = new HttpEntity<>(texts, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class);
-
-        log.info("body:", entity);
+        ResponseEntity<String> response = restTemplate.exchange(apiUrl, HttpMethod.POST, entity, String.class);
 
         String responseBody = response.getBody();
 
         JsonNode rootNode = objectMapper.readTree(responseBody);
-        String content = rootNode.path("result").path("message").path("content").asText();
+        String textData = rootNode
+                .path("result")
+                .path("text")
+                .asText();
 
-        return content;
+        Summarization summarization = Summarization.builder()
+                .member(member)
+                .voiceTextId(clovaVoiceText.getId())
+                .trainer(trainer)
+                .summarizationTexts(textData)
+                .build();
+
+        summarizationRepository.save(summarization);
+
+        return SummarizationResponse.builder()
+                .texts(summarization.getSummarizationTexts())
+                .summarizationId(summarization.getId())
+                .trainerId(trainer.getId())
+                .createAt(summarization.getCreatedAt())
+                .memberId(memberId)
+                .voiceListId(clovaVoiceText.getId())
+                .build();
     }
 
-    public HttpHeaders buildHeaders() {
+    public SummarizationResponse getSummarization(Long summarizationId) {
+        Summarization summarization = summarizationRepository.findById(summarizationId)
+                .orElseThrow(NotFoundSummarizationException::new);
+
+        return SummarizationResponse.builder()
+                .texts(summarization.getSummarizationTexts())
+                .summarizationId(summarization.getId())
+                .trainerId(summarization.getTrainer().getId())
+                .createAt(summarization.getCreatedAt())
+                .memberId(summarization.getMember().getId())
+                .voiceListId(summarization.getVoiceTextId())
+                .build();
+    }
+
+    private HttpHeaders buildHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("X-NCP-CLOVASTUDIO-API-KEY", apiKey);
