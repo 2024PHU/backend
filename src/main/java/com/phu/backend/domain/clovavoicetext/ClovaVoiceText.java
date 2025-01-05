@@ -1,6 +1,6 @@
 package com.phu.backend.domain.clovavoicetext;
 
-import com.phu.backend.dto.clova.ClovaSpeechResponse;
+import com.phu.backend.dto.clova.response.ClovaSpeechResponse;
 import com.phu.backend.global.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
