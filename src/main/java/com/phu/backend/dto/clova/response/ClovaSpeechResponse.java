@@ -1,4 +1,4 @@
-package com.phu.backend.dto.clova;
+package com.phu.backend.dto.clova.response;
 
 import lombok.Builder;
 import lombok.Getter;
